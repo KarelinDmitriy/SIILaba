@@ -20,14 +20,14 @@ namespace ChessModel
 
         }
 
-        public override IEnumerable<Step> getLegalMove()
+        public override IEnumerable<Step> getRightMove()
         {
             List<Step> ret = new List<Step>();
             for (int i = 0; i < 8; i++)
             {
                 if (ChessPoint.PointInBoard(X + _dx[i], Y+_dy[i]))
                 {
-                    if (LegalMove(new ChessPoint(X + _dx[i], Y+_dy[i])))
+                    if (RightMove(new ChessPoint(X + _dx[i], Y+_dy[i])))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y), 

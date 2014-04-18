@@ -18,7 +18,7 @@ namespace ChessModel
             : base(p, 500, x, y)
         { }
 
-        public override IEnumerable<Step> getLegalMove()
+        public override IEnumerable<Step> getRightMove()
         {
             List<Step> ret = new List<Step>();
             for (int i=0; i<8; i++)
@@ -29,7 +29,7 @@ namespace ChessModel
                     ChessPoint to = new ChessPoint(X + _dx[i]*j, Y+_dy[i]*j);
                     if (_board[to.x, to.y] != null && !_board[to.x, to.y].isEnemy(this))
                         break;
-                    if (LegalMove(to))
+                    if (RightMove(to))
                         ret.Add(new Step(new ChessPoint(X, Y), to));
                 }
             }

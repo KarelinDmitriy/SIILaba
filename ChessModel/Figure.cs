@@ -24,7 +24,7 @@ namespace ChessModel
             _point = new ChessPoint(x, y);
         }
 
-        public abstract IEnumerable<Step> getLegalMove();
+        public abstract IEnumerable<Step> getRightMove();
 
         public int Cost
         {
@@ -47,6 +47,11 @@ namespace ChessModel
         {
             return f._player != _player;
         }
+
+        public Player Player
+        {
+            get { return _player; }
+        }
 #endregion
 
 #region private methods
@@ -54,23 +59,14 @@ namespace ChessModel
 #endregion
 
 #region protected methods
-        protected bool LegalMove(ChessPoint to)
+        protected bool RightMove(ChessPoint to)
         {
-            bool f = false;
             if (_board[to.x, to.y] == null ||
                 _board[to.x, to.y].isEnemy(this))
             {
-                Figure fLast = _board[to.x, to.y];
-                _board[to.x, to.y] = this;
-                _board[X, Y] = null;
-                if (_game.calcState(_player) == State.Calm)
-                {
-                    f = true;
-                }
-                _board[X, Y] = this;
-                _board[to.x, to.y] = fLast;
+                return true;
             }
-            return f;
+            return false;
         }
 #endregion 
     }

@@ -19,7 +19,7 @@ namespace ChessModel
             _doStep = false;
         }
 
-        public override IEnumerable<Step> getLegalMove()
+        public override IEnumerable<Step> getRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((
             List<Step> ret = new List<Step>();
@@ -29,32 +29,22 @@ namespace ChessModel
                 {
                     if (_board[X, Y+1] == null)
                     {
-                        _board[X , Y+ 1] = this;
-                        _board[X, Y] = null;
-                        if (_game.calcState(_player) == State.Calm)
-                            ret.Add(new Step(
+                         ret.Add(new Step(
                                 new ChessPoint(X, Y),
                                 new ChessPoint(X , Y+ 1)
                                 ));
-                        _board[X , Y+ 1] = null;
-                        _board[X, Y] = this;
                         if (!_doStep && _board[X, Y+2] == null)
                         {
-                            _board[X , Y+ 2] = this;
-                            _board[X, Y] = null;
-                            if (_game.calcState(_player) == State.Calm)
                                 ret.Add(new Step(
                                     new ChessPoint(X, Y),
                                     new ChessPoint(X , Y+ 2)
                                     ));
-                            _board[X , Y+ 2] = null;
-                            _board[X, Y] = this;
                         }
                     }
                 } //if X+1 in board
                 if (ChessPoint.PointInBoard(X+1, Y+1))
                 {
-                    if (LegalMove(new ChessPoint(X+1, Y+1)))
+                    if (RightMove(new ChessPoint(X+1, Y+1)))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -63,7 +53,7 @@ namespace ChessModel
                 }
                 if (ChessPoint.PointInBoard(X-1, Y+1))
                 {
-                    if (LegalMove(new ChessPoint(X - 1, Y + 1)))
+                    if (RightMove(new ChessPoint(X - 1, Y + 1)))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -77,32 +67,22 @@ namespace ChessModel
                 {
                     if (_board[X, Y - 1] == null)
                     {
-                        _board[X, Y - 1] = this;
-                        _board[X, Y] = null;
-                        if (_game.calcState(_player) == State.Calm)
                             ret.Add(new Step(
                                 new ChessPoint(X, Y),
                                 new ChessPoint(X, Y - 1)
                                 ));
-                        _board[X, Y - 1] = null;
-                        _board[X, Y] = this;
                         if (!_doStep && _board[X, Y - 2] == null)
                         {
-                            _board[X, Y - 2] = this;
-                            _board[X, Y] = null;
-                            if (_game.calcState(_player) == State.Calm)
                                 ret.Add(new Step(
                                     new ChessPoint(X, Y),
                                     new ChessPoint(X, Y - 2)
                                     ));
-                            _board[X, Y - 2] = null;
-                            _board[X, Y] = this;
                         }
                     }
                 } //if X+1 in board
                 if (ChessPoint.PointInBoard(X + 1, Y - 1))
                 {
-                    if (LegalMove(new ChessPoint(X + 1, Y - 1)))
+                    if (RightMove(new ChessPoint(X + 1, Y - 1)))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -111,7 +91,7 @@ namespace ChessModel
                 }
                 if (ChessPoint.PointInBoard(X - 1, Y - 1))
                 {
-                    if (LegalMove(new ChessPoint(X - 1, Y - 1)))
+                    if (RightMove(new ChessPoint(X - 1, Y - 1)))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
