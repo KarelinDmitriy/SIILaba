@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChessModel
 {
-    public enum State
+    public class AI
     {
-        Calm,
-        Check, 
-        Checkmate
     }
 }

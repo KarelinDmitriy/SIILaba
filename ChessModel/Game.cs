@@ -6,26 +6,23 @@ using System.Threading.Tasks;
 
 namespace ChessModel
 {
-    public class Chessboard
+    public class Game
     {
 #region variable
-        Figure[,] _matrix;
+
 #endregion 
 
 #region public methods
-        public Chessboard()
-        {
-            _matrix = new Figure[8, 8];
-            InitDesk();
-        }
 
-#endregion
 
-#region private methods
-        private void InitDesk()
+        public State calcState(Player player)
         {
             throw new NotImplementedException();
         }
+#endregion
+
+#region private methods
+
 #endregion
     }
 }
