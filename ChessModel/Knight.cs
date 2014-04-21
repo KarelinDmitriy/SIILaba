@@ -40,6 +40,18 @@ namespace ChessModel
             return ret;
         }
 
+        public override bool attackTarget(Figure f)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                if (ChessPoint.PointInBoard(X + _dx[i], Y + _dy[i]))
+                {
+                    if (_board[X + _dx[i], Y + _dy[i]] == f) return true;
+                }
+            }
+            return false;
+        }
+
         public override string ToString()
         {
             return _player == ChessModel.Player.White ? "H" : "h";

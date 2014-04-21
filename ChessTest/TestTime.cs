@@ -47,9 +47,9 @@ namespace ChessTest
         }
 
         [TestMethod]
-        [Timeout(50)]
         public void FirstStepState()
         {
+            
             Figure._board = new Figure[8, 8];
             Game._board = Figure._board;
             //Создаем пешек
@@ -75,10 +75,13 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            var g = new Game();
-            var s = g.calcState();
+            for (long  i = 0; i < 1000000; i++)
+            {
+                var g = new Game();
+                var s = g.calcState();
+            }
 
-            Assert.AreEqual(s, State.Calm);
+//            Assert.AreEqual(s, State.Calm);
 
         }
     }

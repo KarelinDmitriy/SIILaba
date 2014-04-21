@@ -47,13 +47,10 @@ namespace ChessModel
 
         public State calcState()
         {
-            var enemyMoves = getAllRightMoves(getEnemy(_player));
             Figure ownKing;
             if (_player== Player.White) ownKing = _whiteKing;
             else ownKing = _blackKing;
-            var kingAlert = enemyMoves
-                   .Where(mov => _board[mov.to.x, mov.to.y] == ownKing)
-                   .Select(mov => _board[mov.from.x, mov.from.y]).Count();
+            int kingAlert = countAtacksToFigure(ownKing);
             if (kingAlert == 0) return State.Calm;
             else
             {
@@ -73,16 +70,13 @@ namespace ChessModel
             else ownKing = _blackKing;
             foreach (var move in moves)
             {
-                //пытаемся делать ход
+                //пытаемся делать ход+
                 Figure fLast = _board[move.to.x, move.to.y]; //фигура, которая убирается с доски (возможно null)
                 Figure fStep = _board[move.from.x, move.from.y]; //фигура, которой ходят
                 _board[move.to.x, move.to.y] = fStep;
                 _board[move.from.x, move.from.y] = null;
                 //ход сделали, теперь пытаемя проведить, а не шах ли нам после этого
-                var enemyMoves = getAllRightMoves(getEnemy(p));
-                //Проверяем, не атакуют ли нас сейчас
-                var kingAlert = enemyMoves
-                    .Where(mov => _board[mov.to.x, mov.to.y] == ownKing).Count();
+                var kingAlert = countAtacksToFigure(ownKing);
                 if (kingAlert == 0) ret.Add(move);
                 _board[move.to.x, move.to.y] = fLast;
                 _board[move.from.x, move.from.y] = fStep;
@@ -105,6 +99,19 @@ namespace ChessModel
                 }
             }
             return ret;
+        }
+
+        int countAtacksToFigure(Figure f)
+        {
+            int count = 0;
+            foreach (var x in _board)
+            {
+                if (x !=null && x.Player!=f.Player)
+                {
+                    if (x.attackTarget(f)) count++;
+                }
+            }
+            return count;
         }
 
         private Player getEnemy(Player p)

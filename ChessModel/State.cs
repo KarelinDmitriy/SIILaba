@@ -10,6 +10,7 @@ namespace ChessModel
     {
         Calm,
         Check, 
-        Checkmate
+        Checkmate, 
+        Draw
     }
 }

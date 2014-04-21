@@ -26,6 +26,7 @@ namespace ChessModel
         }
 
         public abstract IEnumerable<Step> getRightMove();
+        public abstract bool attackTarget(Figure f);
 
         public int Cost
         {
@@ -70,5 +71,7 @@ namespace ChessModel
             return false;
         }
 #endregion 
+    
+        
     }
 }

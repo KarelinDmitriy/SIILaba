@@ -102,6 +102,33 @@ namespace ChessModel
             return ret;
         }
 
+        public override bool attackTarget(Figure f)
+        {
+            if (_player == ChessModel.Player.White)
+            {
+                if (ChessPoint.PointInBoard(X + 1, Y + 1))
+                {
+                    if (_board[X + 1, Y + 1] == f) return true;
+                }
+                if (ChessPoint.PointInBoard(X + 1, Y - 1))
+                {
+                    if (_board[X + 1, Y - 1] == f) return true;
+                }
+            }
+            else
+            {
+                if (ChessPoint.PointInBoard(X - 1, Y + 1))
+                {
+                    if (_board[X - 1, Y + 1] == f) return true;
+                }
+                if (ChessPoint.PointInBoard(X - 1, Y - 1))
+                {
+                    if (_board[X - 1, Y - 1] == f) return true;
+                }
+            }
+            return false;
+        }
+
         public override string ToString()
         {
             return _player==ChessModel.Player.White ? "P" : "p";

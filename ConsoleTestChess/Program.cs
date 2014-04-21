@@ -65,7 +65,7 @@ namespace ConsoleTestChess
                 Step st = Step.stringToStep(step);
                 try
                 {
-                    g.doMove(st);
+                        g.doMove(st);
                     s = g.calcState();
                 }
                 catch (ErrorStepExveption)
