@@ -25,19 +25,19 @@ namespace ChessModel
             List<Step> ret = new List<Step>();
             if (_player == Player.White)
             {
-                if (ChessPoint.PointInBoard(X, Y+1))
+                if (ChessPoint.PointInBoard(X+1, Y))
                 {
-                    if (_board[X, Y+1] == null)
+                    if (_board[X+1, Y] == null)
                     {
                          ret.Add(new Step(
                                 new ChessPoint(X, Y),
-                                new ChessPoint(X , Y+ 1)
+                                new ChessPoint(X+1 , Y)
                                 ));
-                        if (!_doStep && _board[X, Y+2] == null)
+                        if (!_doStep && _board[X+2, Y] == null)
                         {
                                 ret.Add(new Step(
                                     new ChessPoint(X, Y),
-                                    new ChessPoint(X , Y+ 2)
+                                    new ChessPoint(X+2 , Y)
                                     ));
                         }
                     }
@@ -51,42 +51,42 @@ namespace ChessModel
                             new ChessPoint(X + 1, Y + 1)));
                     }
                 }
-                if (ChessPoint.PointInBoard(X-1, Y+1))
-                {
-                    if (RightMove(new ChessPoint(X - 1, Y + 1)))
-                    {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X - 1, Y + 1)));
-                    }
-                }
-            }
-            else 
-            {
-                if (ChessPoint.PointInBoard(X, Y - 1))
-                {
-                    if (_board[X, Y - 1] == null)
-                    {
-                            ret.Add(new Step(
-                                new ChessPoint(X, Y),
-                                new ChessPoint(X, Y - 1)
-                                ));
-                        if (!_doStep && _board[X, Y - 2] == null)
-                        {
-                                ret.Add(new Step(
-                                    new ChessPoint(X, Y),
-                                    new ChessPoint(X, Y - 2)
-                                    ));
-                        }
-                    }
-                } //if X+1 in board
-                if (ChessPoint.PointInBoard(X + 1, Y - 1))
+                if (ChessPoint.PointInBoard(X+1, Y-1))
                 {
                     if (RightMove(new ChessPoint(X + 1, Y - 1)))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
                             new ChessPoint(X + 1, Y - 1)));
+                    }
+                }
+            }
+            else 
+            {
+                if (ChessPoint.PointInBoard(X-1, Y))
+                {
+                    if (_board[X-1, Y ] == null)
+                    {
+                            ret.Add(new Step(
+                                new ChessPoint(X, Y),
+                                new ChessPoint(X-1, Y)
+                                ));
+                        if (!_doStep && _board[X-2, Y] == null)
+                        {
+                                ret.Add(new Step(
+                                    new ChessPoint(X, Y),
+                                    new ChessPoint(X-2, Y)
+                                    ));
+                        }
+                    }
+                } //if X+1 in board
+                if (ChessPoint.PointInBoard(X - 1, Y + 1))
+                {
+                    if (RightMove(new ChessPoint(X - 1, Y + 1)))
+                    {
+                        ret.Add(new Step(
+                            new ChessPoint(X, Y),
+                            new ChessPoint(X - 1, Y + 1)));
                     }
                 }
                 if (ChessPoint.PointInBoard(X - 1, Y - 1))
@@ -100,6 +100,11 @@ namespace ChessModel
                 }
             }
             return ret;
+        }
+
+        public override string ToString()
+        {
+            return _player==ChessModel.Player.White ? "P" : "p";
         }
 #endregion
 

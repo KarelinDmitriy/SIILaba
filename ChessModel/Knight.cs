@@ -39,6 +39,11 @@ namespace ChessModel
             }
             return ret;
         }
+
+        public override string ToString()
+        {
+            return _player == ChessModel.Player.White ? "H" : "h";
+        }
 #endregion
 
 #region private methods

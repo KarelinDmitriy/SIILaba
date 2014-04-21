@@ -33,9 +33,15 @@ namespace ChessModel
                         break;
                     if (RightMove(to))
                         ret.Add(new Step(new ChessPoint(X, Y), to));
+                    j++;
                 }
             }
             return ret;
+        }
+
+        public override string ToString()
+        {
+            return _player == ChessModel.Player.White ? "B" : "b";
         }
 #endregion
 

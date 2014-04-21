@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace ChessModel
     {
 #region variable
         Figure _whiteKing, _blackKing;
-        static Figure[,] _board;
+        public static Figure[,] _board;
         Player _player;
 #endregion 
 
@@ -30,7 +31,18 @@ namespace ChessModel
 
         public void doMove(Step s)
         {
-            
+            var steps = getAllLegalMoves(_player);
+            var yes = steps.FirstOrDefault(x => x.from.x == s.from.x &&
+                                                x.from.y == s.from.y &&
+                                                x.to.y == s.to.y &&
+                                                x.to.x == s.to.x);
+            if (yes == null)
+                throw new ErrorStepExveption("Не возможно совершить ход");
+            _board[s.to.x, s.to.y] = _board[s.from.x, s.from.y];
+            _board[s.from.x, s.from.y] = null;
+            _board[s.to.x, s.to.y].X = s.to.x;
+            _board[s.to.x, s.to.y].Y = s.to.y;
+            _player = getEnemy(_player);
         }
 
         public State calcState()
@@ -55,7 +67,7 @@ namespace ChessModel
         {
             List<Step> ret = new List<Step>();
             var moves = getAllRightMoves(_player);
-            //запоминаем, какого короля мы должна атаковать
+            //запоминаем, какого короля мы должны атаковать
             Figure ownKing;
             if (p == Player.White) ownKing = _whiteKing;
             else ownKing = _blackKing;
@@ -70,9 +82,10 @@ namespace ChessModel
                 var enemyMoves = getAllRightMoves(getEnemy(p));
                 //Проверяем, не атакуют ли нас сейчас
                 var kingAlert = enemyMoves
-                    .Where(mov => _board[mov.to.x, mov.to.y] == ownKing)
-                    .Select(mov => _board[mov.from.x, mov.from.y]).Count();
+                    .Where(mov => _board[mov.to.x, mov.to.y] == ownKing).Count();
                 if (kingAlert == 0) ret.Add(move);
+                _board[move.to.x, move.to.y] = fLast;
+                _board[move.from.x, move.from.y] = fStep;
             }
             return ret;
         }

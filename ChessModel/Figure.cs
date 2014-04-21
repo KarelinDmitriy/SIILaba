@@ -9,7 +9,7 @@ namespace ChessModel
     public abstract class Figure
     {
 #region variable
-        protected static Figure[,] _board;
+        public static Figure[,] _board;
         protected static Game _game;
         private int _cost;
         protected ChessPoint _point;
@@ -22,6 +22,7 @@ namespace ChessModel
             _player = player;
             _cost = cost;
             _point = new ChessPoint(x, y);
+            _board[x, y] = this;
         }
 
         public abstract IEnumerable<Step> getRightMove();
