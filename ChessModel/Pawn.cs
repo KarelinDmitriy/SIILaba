@@ -44,7 +44,7 @@ namespace ChessModel
                 } //if X+1 in board
                 if (ChessPoint.PointInBoard(X+1, Y+1))
                 {
-                    if (RightMove(new ChessPoint(X+1, Y+1)))
+                    if (_board[X+1, Y+1] != null && _board[X+1, Y+1].isEnemy(this))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -53,7 +53,7 @@ namespace ChessModel
                 }
                 if (ChessPoint.PointInBoard(X+1, Y-1))
                 {
-                    if (RightMove(new ChessPoint(X + 1, Y - 1)))
+                    if (_board[X + 1, Y - 1] != null && _board[X + 1, Y - 1].isEnemy(this))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -82,7 +82,7 @@ namespace ChessModel
                 } //if X+1 in board
                 if (ChessPoint.PointInBoard(X - 1, Y + 1))
                 {
-                    if (RightMove(new ChessPoint(X - 1, Y + 1)))
+                    if (_board[X - 1, Y + 1] != null && _board[X - 1, Y + 1].isEnemy(this))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),
@@ -91,7 +91,7 @@ namespace ChessModel
                 }
                 if (ChessPoint.PointInBoard(X - 1, Y - 1))
                 {
-                    if (RightMove(new ChessPoint(X - 1, Y - 1)))
+                    if (_board[X - 1, Y - 1] != null && _board[X - 1, Y - 1].isEnemy(this))
                     {
                         ret.Add(new Step(
                             new ChessPoint(X, Y),

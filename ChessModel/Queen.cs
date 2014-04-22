@@ -26,6 +26,7 @@ namespace ChessModel
                 int j = 1;
                 while (ChessPoint.PointInBoard(X+_dx[i]*j, Y+_dy[i]*j))
                 {
+                    //isEnemy вызывается 2-а раза
                     ChessPoint to = new ChessPoint(X + _dx[i]*j, Y+_dy[i]*j);
                     if (_board[to.x, to.y] != null && !_board[to.x, to.y].isEnemy(this))
                         break;

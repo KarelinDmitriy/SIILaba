@@ -12,7 +12,6 @@ namespace ChessTest
     public class TestTime
     {
         [TestMethod]
-        [Timeout(50)]
         public void FirstStep()
         {
             Figure._board = new Figure[8, 8];
@@ -40,10 +39,11 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            var g = new Game();
-
-            var steps = g.getAllLegalMoves(Player.White);
-
+            for (int i = 0; i < 2000; i++)
+            {
+                var g = new Game();
+                var steps = g.getAllLegalMoves(Player.White);
+            }
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            for (long  i = 0; i < 1000000; i++)
+            for (long  i = 0; i < 2000; i++)
             {
                 var g = new Game();
                 var s = g.calcState();

@@ -11,7 +11,7 @@ namespace ConsoleTestChess
     {
         static void PrintBoard(Figure[,] board)
         {
-            Console.WriteLine("  A B C D E F J I");
+            Console.WriteLine("  A B C D E F G H");
             Console.WriteLine();
             for (int i=0; i<8; i++)
             {
@@ -60,7 +60,7 @@ namespace ConsoleTestChess
                 PrintBoard(Figure._board);
                 Console.WriteLine();
 
-                Console.Write("Введите ваш ход: ");
+                Console.Write("Введите ваш ход({0}): ", g.Player);
                 string step = Console.ReadLine();
                 Step st = Step.stringToStep(step);
                 try

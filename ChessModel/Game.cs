@@ -51,10 +51,14 @@ namespace ChessModel
             if (_player== Player.White) ownKing = _whiteKing;
             else ownKing = _blackKing;
             int kingAlert = countAtacksToFigure(ownKing);
-            if (kingAlert == 0) return State.Calm;
+            var count = getAllLegalMoves(_player).Count();
+            if (kingAlert == 0)
+            {
+                if (count == 0) return State.Draw;
+                return State.Calm;
+            }
             else
             {
-                var count = getAllLegalMoves(_player).Count();
                 if (count > 0) return State.Check;
                 else return State.Checkmate;
             }
@@ -82,6 +86,11 @@ namespace ChessModel
                 _board[move.from.x, move.from.y] = fStep;
             }
             return ret;
+        }
+
+        public Player Player
+        {
+            get { return _player; }
         }
 #endregion
 
