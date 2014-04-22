@@ -9,10 +9,9 @@ namespace ChessModel
     public abstract class Figure
     {
 #region variable
-        public static Figure[,] _board;
+        public static Figure[] _board;
         protected static Game _game;
         private int _cost;
-        protected ChessPoint _point;
         protected Player _player;
 #endregion 
 
@@ -21,8 +20,9 @@ namespace ChessModel
         {
             _player = player;
             _cost = cost;
-            _point = new ChessPoint(x, y);
-            _board[x, y] = this;
+            X = x;
+            Y = y;
+            _board[(x<<3) + y] = this;
         }
 
         public abstract IEnumerable<Step> getRightMove();
@@ -35,14 +35,14 @@ namespace ChessModel
 
         public int X
         {
-            get { return _point.x; }
-            set { _point.x = value; }
+            get;
+            set;
         }
 
         public int Y
         {
-            get { return _point.y;}
-            set { _point.y= value; }
+            get;
+            set;
         }
 
         public bool isEnemy(Figure f)
@@ -61,10 +61,10 @@ namespace ChessModel
 #endregion
 
 #region protected methods
-        protected bool RightMove(ChessPoint to)
+        protected bool RightMove(int x, int y)
         {
-            if (_board[to.x, to.y] == null ||
-                _board[to.x, to.y].isEnemy(this))
+            if (_board[(x<<3)+y] == null ||
+                _board[(x<<3)+y].isEnemy(this))
             {
                 return true;
             }

@@ -11,7 +11,7 @@ namespace ChessModel
     {
 #region variable
         Figure _whiteKing, _blackKing;
-        public static Figure[,] _board;
+        public static Figure[] _board;
         Player _player;
 #endregion 
 
@@ -21,27 +21,27 @@ namespace ChessModel
             _player = Player.White;
             for (int i=0; i<8; i++)
                 for (int j=0; j<8; j++)
-                    if (_board[i,j] is King)
+                    if (_board[(i<<3)+j] is King)
                     {
-                        if (_board[i, j].Player == Player.White)
-                            _whiteKing = _board[i, j];
-                        else _blackKing = _board[i, j];
+                        if (_board[(i<<3)+j].Player == Player.White)
+                            _whiteKing = _board[(i<<3)+j];
+                        else _blackKing = _board[(i<<3)+j];
                     }
         }
 
         public void doMove(Step s)
         {
             var steps = getAllLegalMoves(_player);
-            var yes = steps.FirstOrDefault(x => x.from.x == s.from.x &&
-                                                x.from.y == s.from.y &&
-                                                x.to.y == s.to.y &&
-                                                x.to.x == s.to.x);
-            if (yes == null)
-                throw new ErrorStepExveption("Не возможно совершить ход");
-            _board[s.to.x, s.to.y] = _board[s.from.x, s.from.y];
-            _board[s.from.x, s.from.y] = null;
-            _board[s.to.x, s.to.y].X = s.to.x;
-            _board[s.to.x, s.to.y].Y = s.to.y;
+            var yes = steps.FirstOrDefault(x => x.fx == s.fx &&
+                                                x.fy == s.fy &&
+                                                x.tx == s.tx &&
+                                                x.ty == s.ty);
+           // if (yes == null)
+             //   throw new ErrorStepExveption("Не возможно совершить ход");
+            _board[(s.tx<<3)+s.ty] = _board[(s.fx<<3)+s.fy];
+            _board[(s.fx<<3)+s.fy] = null;
+            _board[(s.tx<<3)+s.ty].X = s.tx;
+            _board[(s.tx<<3)+s.ty].Y = s.ty;
             _player = getEnemy(_player);
         }
 
@@ -75,15 +75,15 @@ namespace ChessModel
             foreach (var move in moves)
             {
                 //пытаемся делать ход+
-                Figure fLast = _board[move.to.x, move.to.y]; //фигура, которая убирается с доски (возможно null)
-                Figure fStep = _board[move.from.x, move.from.y]; //фигура, которой ходят
-                _board[move.to.x, move.to.y] = fStep;
-                _board[move.from.x, move.from.y] = null;
+                Figure fLast = _board[(move.tx<<3)+move.ty]; //фигура, которая убирается с доски (возможно null)
+                Figure fStep = _board[(move.fx<<3)+move.fy]; //фигура, которой ходят
+                _board[(move.tx<<3)+move.ty] = fStep;
+                _board[(move.fx<<3)+move.fy] = null;
                 //ход сделали, теперь пытаемя проведить, а не шах ли нам после этого
                 var kingAlert = countAtacksToFigure(ownKing);
                 if (kingAlert == 0) ret.Add(move);
-                _board[move.to.x, move.to.y] = fLast;
-                _board[move.from.x, move.from.y] = fStep;
+                _board[(move.tx<<3)+move.ty] = fLast;
+                _board[(move.fx<<3)+move.fy] = fStep;
             }
             return ret;
         }

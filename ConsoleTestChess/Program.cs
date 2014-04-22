@@ -9,7 +9,7 @@ namespace ConsoleTestChess
 {
     class Program
     {
-        static void PrintBoard(Figure[,] board)
+        static void PrintBoard(Figure[] board)
         {
             Console.WriteLine("  A B C D E F G H");
             Console.WriteLine();
@@ -18,8 +18,8 @@ namespace ConsoleTestChess
                 Console.Write((i + 1).ToString() + " ");
                 for (int j=0; j<8; j++)
                 {
-                    if (board[i, j] == null) Console.Write(". ");
-                    else Console.Write(board[i, j].ToString()+" ");
+                    if (board[(i<<3) + j] == null) Console.Write(". ");
+                    else Console.Write(board[(i<<3) + j].ToString()+" ");
                 }
                 Console.WriteLine();
             }
@@ -27,7 +27,7 @@ namespace ConsoleTestChess
 
         static void Main(string[] args)
         {
-            Figure._board = new Figure[8, 8];
+            Figure._board = new Figure[64];
             Game._board = Figure._board;
             //Создаем пешек
             for (int i = 0; i < 8; i++)

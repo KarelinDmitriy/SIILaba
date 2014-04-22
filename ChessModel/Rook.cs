@@ -26,13 +26,18 @@ namespace ChessModel
             for (int i = 0; i < 4; i++)
             {
                 int j = 1;
-                while (ChessPoint.PointInBoard(X + _dx[i] * j, Y + _dy[i] * j))
+                while ((((X + _dx[i] * j) & (int.MaxValue - 7)) == 0) &&
+                        ((Y + _dy[i] * j) & (int.MaxValue - 7)) == 0)
                 {
-                    ChessPoint to = new ChessPoint(X + _dx[i] * j, Y + _dy[i] * j);
-                    if (_board[to.x, to.y] != null && !_board[to.x, to.y].isEnemy(this))
+                    int nx = X + _dx[i] * j;
+                    int ny = Y + _dy[i] * j;
+                    if (_board[(nx<<3) + ny] != null)
+                    {
+                        if (_board[(nx<<3) + ny].Player != _player)
+                            ret.Add(new Step(X, Y, nx, ny));
                         break;
-                    if (RightMove(to))
-                        ret.Add(new Step(new ChessPoint(X, Y), to));
+                    }
+                    ret.Add(new Step(X, Y, nx, ny));
                     j++;
                 }
             }
@@ -44,11 +49,13 @@ namespace ChessModel
             for (int i = 0; i < 4; i++)
             {
                 int j = 1;
-                while (ChessPoint.PointInBoard(X + _dx[i] * j, Y + _dy[i] * j))
+                while ((((X + _dx[i] * j) & (int.MaxValue - 7)) == 0) &&
+                        ((Y + _dy[i] * j) & (int.MaxValue - 7)) == 0)
                 {
-                    ChessPoint to = new ChessPoint(X + _dx[i] * j, Y + _dy[i] * j);
-                    if (_board[to.x, to.y] == f) return true;
-                    if (_board[to.x, to.y] != null)
+                    int nx = X + _dx[i] * j;
+                    int ny = Y + _dy[i] * j;
+                    if (_board[(nx<<3) + ny] == f) return true;
+                    if (_board[(nx<<3) + ny] != null)
                         break;
                     j++;
                 }

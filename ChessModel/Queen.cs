@@ -8,12 +8,12 @@ namespace ChessModel
 {
     public class Queen : Figure
     {
-#region variable
+        #region variable
         static readonly int[] _dx = { 1, 0, -1, 1, -1, 1, 0, -1 };
         static readonly int[] _dy = { 1, 1, 1, 0, 0, -1, -1, -1 };
-#endregion 
+        #endregion
 
-#region public methods
+        #region public methods
         public Queen(Player p, int x, int y)
             : base(p, 500, x, y)
         { }
@@ -21,17 +21,21 @@ namespace ChessModel
         public override IEnumerable<Step> getRightMove()
         {
             List<Step> ret = new List<Step>();
-            for (int i=0; i<8; i++)
+            for (int i = 0; i < 8; i++)
             {
                 int j = 1;
-                while (ChessPoint.PointInBoard(X+_dx[i]*j, Y+_dy[i]*j))
+                while ((((X + _dx[i] * j) & (int.MaxValue-7)) == 0) && 
+                        ((Y + _dy[i] * j) & (int.MaxValue-7)) == 0)
                 {
-                    //isEnemy вызывается 2-а раза
-                    ChessPoint to = new ChessPoint(X + _dx[i]*j, Y+_dy[i]*j);
-                    if (_board[to.x, to.y] != null && !_board[to.x, to.y].isEnemy(this))
+                    int nx = X + _dx[i] * j;
+                    int ny = Y + _dy[i] * j;
+                    if (_board[(nx<<3) + ny] != null)
+                    {
+                        if (_board[(nx<<3) + ny].Player!=_player)
+                            ret.Add(new Step(X, Y, nx, ny));
                         break;
-                    if (RightMove(to))
-                        ret.Add(new Step(new ChessPoint(X, Y), to));
+                    }
+                    ret.Add(new Step(X, Y, nx, ny));
                     j++;
                 }
             }
@@ -43,11 +47,13 @@ namespace ChessModel
             for (int i = 0; i < 8; i++)
             {
                 int j = 1;
-                while (ChessPoint.PointInBoard(X + _dx[i] * j, Y + _dy[i] * j))
+                while ((((X + _dx[i] * j) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + _dy[i] * j) & (int.MaxValue - 7)) == 0)
                 {
-                    ChessPoint to = new ChessPoint(X + _dx[i] * j, Y + _dy[i] * j);
-                    if (_board[to.x, to.y] == f) return true;
-                    if (_board[to.x, to.y] != null)
+                    int nx = X + _dx[i] * j;
+                    int ny = Y + _dy[i] * j;
+                    if (_board[(nx<<3) + ny] == f) return true;
+                    if (_board[(nx<<3) + ny] != null)
                         break;
                     j++;
                 }
@@ -59,10 +65,10 @@ namespace ChessModel
         {
             return _player == ChessModel.Player.White ? "Q" : "q";
         }
-#endregion
+        #endregion
 
-#region private methods
+        #region private methods
 
-#endregion
+        #endregion
     }
 }

@@ -14,7 +14,7 @@ namespace ChessTest
         [TestMethod]
         public void FirstStep()
         {
-            Figure._board = new Figure[8, 8];
+            Figure._board = new Figure[64];
             Game._board = Figure._board;
             //Создаем пешек
             for (int i=0; i<8; i++)
@@ -39,7 +39,7 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            for (int i = 0; i < 2000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 var g = new Game();
                 var steps = g.getAllLegalMoves(Player.White);
@@ -50,7 +50,7 @@ namespace ChessTest
         public void FirstStepState()
         {
             
-            Figure._board = new Figure[8, 8];
+            Figure._board = new Figure[64];
             Game._board = Figure._board;
             //Создаем пешек
             for (int i = 0; i < 8; i++)
@@ -75,7 +75,7 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            for (long  i = 0; i < 2000; i++)
+            for (long  i = 0; i < 100000; i++)
             {
                 var g = new Game();
                 var s = g.calcState();
@@ -83,6 +83,25 @@ namespace ChessTest
 
 //            Assert.AreEqual(s, State.Calm);
 
+        }
+
+       // [TestMethod]
+        public void time1()
+        {
+            int[,] a = new int[8, 8];
+            int c;
+            for (int i = 0; i < int.MaxValue; i++)
+                c = a[7, 7]; 
+        }
+
+     //   [TestMethod]
+        public void time2()
+        {
+            int[] a = new int[64];
+            int c;
+            int s = 1;
+            for (int i = 0; i < int.MaxValue; i++)
+                c = a[(s<<3) + 3]; 
         }
     }
 }

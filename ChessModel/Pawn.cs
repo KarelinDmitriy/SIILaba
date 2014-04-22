@@ -25,77 +25,61 @@ namespace ChessModel
             List<Step> ret = new List<Step>();
             if (_player == Player.White)
             {
-                if (ChessPoint.PointInBoard(X+1, Y))
+                if (((X+1) & (int.MaxValue - 7)) == 0) 
                 {
-                    if (_board[X+1, Y] == null)
+                    if (_board[((X+1)<<3) + Y] == null)
                     {
-                         ret.Add(new Step(
-                                new ChessPoint(X, Y),
-                                new ChessPoint(X+1 , Y)
-                                ));
-                        if (!_doStep && _board[X+2, Y] == null)
+                        ret.Add(new Step(X, Y, X + 1, Y));
+                        if (!_doStep && _board[((X+2)<<3) + Y] == null)
                         {
-                                ret.Add(new Step(
-                                    new ChessPoint(X, Y),
-                                    new ChessPoint(X+2 , Y)
-                                    ));
+                                ret.Add(new Step(X, Y, X+2, Y));
                         }
                     }
                 } //if X+1 in board
-                if (ChessPoint.PointInBoard(X+1, Y+1))
+                if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X+1, Y+1] != null && _board[X+1, Y+1].isEnemy(this))
+                    if (_board[((X+1)<<3) + Y+1] != null && _board[((X+1)<<3) +  Y+1].isEnemy(this))
                     {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X + 1, Y + 1)));
+                        ret.Add(new Step(X, Y, X+1, Y+1));
                     }
                 }
-                if (ChessPoint.PointInBoard(X+1, Y-1))
+                if ((((X +1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y -1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + 1, Y - 1] != null && _board[X + 1, Y - 1].isEnemy(this))
+                    if (_board[((X + 1)<<3) + Y - 1] != null && _board[((X + 1)<<3) +  Y - 1].isEnemy(this))
                     {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X + 1, Y - 1)));
+                        ret.Add(new Step(X, Y, X+1,Y-1));
                     }
                 }
             }
             else 
             {
-                if (ChessPoint.PointInBoard(X-1, Y))
+                if (((X -1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X-1, Y ] == null)
+                    if (_board[((X-1)<<3) + Y ] == null)
                     {
-                            ret.Add(new Step(
-                                new ChessPoint(X, Y),
-                                new ChessPoint(X-1, Y)
-                                ));
-                        if (!_doStep && _board[X-2, Y] == null)
+                            ret.Add(new Step(X, Y, X-1, Y));
+                        if (!_doStep && _board[((X-2)<<3) + Y] == null)
                         {
-                                ret.Add(new Step(
-                                    new ChessPoint(X, Y),
-                                    new ChessPoint(X-2, Y)
-                                    ));
+                                ret.Add(new Step(X, Y, X-2, Y));
                         }
                     }
                 } //if X+1 in board
-                if (ChessPoint.PointInBoard(X - 1, Y + 1))
+                if ((((X - 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y +  1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y + 1] != null && _board[X - 1, Y + 1].isEnemy(this))
+                    if (_board[((X - 1)<<3) + Y + 1] != null && _board[((X - 1)<<3) + Y + 1].isEnemy(this))
                     {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X - 1, Y + 1)));
+                        ret.Add(new Step(X,Y, X-1, Y+1));
                     }
                 }
-                if (ChessPoint.PointInBoard(X - 1, Y - 1))
+                if ((((X -1 ) & (int.MaxValue - 7)) == 0) &&
+                       ((Y - 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y - 1] != null && _board[X - 1, Y - 1].isEnemy(this))
+                    if (_board[((X - 1)<<3) + Y - 1] != null && _board[((X - 1)<<3) + Y - 1].isEnemy(this))
                     {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X - 1, Y - 1)));
+                        ret.Add(new Step(X, Y, X-1, Y-1));
                     }
                 }
             }
@@ -106,24 +90,28 @@ namespace ChessModel
         {
             if (_player == ChessModel.Player.White)
             {
-                if (ChessPoint.PointInBoard(X + 1, Y + 1))
+                if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + 1, Y + 1] == f) return true;
+                    if (_board[((X + 1)<<3) + Y + 1] == f) return true;
                 }
-                if (ChessPoint.PointInBoard(X + 1, Y - 1))
+                if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y -1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + 1, Y - 1] == f) return true;
+                    if (_board[((X + 1)<<3) + Y - 1] == f) return true;
                 }
             }
             else
             {
-                if (ChessPoint.PointInBoard(X - 1, Y + 1))
+                if ((((X - 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y + 1] == f) return true;
+                    if (_board[((X - 1)<<3) + Y + 1] == f) return true;
                 }
-                if (ChessPoint.PointInBoard(X - 1, Y - 1))
+                if ((((X - 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y - 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y - 1] == f) return true;
+                    if (_board[((X - 1)<<3) +  Y - 1] == f) return true;
                 }
             }
             return false;

@@ -26,14 +26,12 @@ namespace ChessModel
             List<Step> ret = new List<Step>();
             for (int i = 0; i < 8; i++)
             {
-                if (ChessPoint.PointInBoard(X + _dx[i], Y + _dy[i]))
+                if ((((X + _dx[i]) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + _dy[i]) & (int.MaxValue - 7)) == 0)
                 {
-                   if (RightMove(new ChessPoint(X + _dx[i], Y + _dy[i])))
+                   if (RightMove(X + _dx[i], Y +_dy[i]))
                    {
-                       ret.Add(new Step(
-                           new ChessPoint(X, Y), 
-                           new ChessPoint(X + _dx[i], Y + _dy[i]))
-                       );
+                       ret.Add(new Step(X, Y, X + _dx[i], Y + _dy[i]));
                    }
                 }
             }
@@ -44,9 +42,10 @@ namespace ChessModel
         {
             for (int i = 0; i < 8; i++)
             {
-                if (ChessPoint.PointInBoard(X + _dx[i], Y + _dy[i]))
+                if ((((X + _dx[i]) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + _dy[i]) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + _dx[i], Y + _dy[i]] == f)
+                    if (_board[((X + _dx[i])<<3) + Y + _dy[i]] == f)
                         return true;
                 }
             }
