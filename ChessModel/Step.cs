@@ -26,6 +26,14 @@ namespace ChessModel
             _ty = ty;
         }
 
+        public Step(Step s)
+        {
+            _fx = s.fx;
+            _fy = s.fy;
+            _tx = s.tx;
+            _ty = s.ty;
+        }
+
         public static Step stringToStep(string a)
         {
             int y1 = a[0] - 'a';
