@@ -12,7 +12,6 @@ namespace ChessModel
         public Step step;
         public Figure fFrom;
         public Figure fOut;
-
         public static Figure[] _board;
 #endregion 
 

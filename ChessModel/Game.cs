@@ -67,7 +67,7 @@ namespace ChessModel
         public IEnumerable<Step> getAllLegalMoves(Player p)
         {
             List<Step> ret = new List<Step>();
-            var moves = getAllRightMoves(_player);
+            var moves = getAllRightMoves(p);
             //запоминаем, какого короля мы должны атаковать
             Figure ownKing;
             if (p == Player.White) ownKing = _whiteKing;
@@ -75,6 +75,7 @@ namespace ChessModel
             foreach (var move in moves)
             {
                 //пытаемся делать ход+
+                Debug.Assert(ownKing != null);
                 Figure fLast = _board[(move.tx<<3)+move.ty]; //фигура, которая убирается с доски (возможно null)
                 Figure fStep = _board[(move.fx<<3)+move.fy]; //фигура, которой ходят
                 _board[(move.tx<<3)+move.ty] = fStep;
@@ -96,7 +97,7 @@ namespace ChessModel
 
 #region private methods
 
-        IEnumerable<Step> getAllRightMoves(Player p)
+        public IEnumerable<Step> getAllRightMoves(Player p)
         {
             List<Step> ret = new List<Step>();
             foreach (var x in _board)

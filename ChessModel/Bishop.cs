@@ -15,7 +15,7 @@ namespace ChessModel
 
 #region public methods
         public Bishop(Player p, int x, int y)
-            :base(p, 200, x, y)
+            :base(p, 300, x, y)
         {
 
         }
@@ -34,7 +34,7 @@ namespace ChessModel
                         int ny = Y + _dy[i] * j;
                         if (_board[(nx<<3) + ny] != null)
                         {
-                            if (_board[(nx<<3) + ny].Player ==_player)
+                            if (_board[(nx<<3) + ny].Player !=_player)
                                 ret.Add(new Step(X, Y, nx, ny));
                             break;
                         }
@@ -56,7 +56,7 @@ namespace ChessModel
                 {
                     int nx = X + _dx[i] * j;
                     int ny = Y + _dy[i] * j;
-                    if (_board[(nx<<3) + ny] == f) return true;
+                    if (ReferenceEquals(_board[(nx<<3) + ny], f)) return true;
                     if (_board[(nx<<3) + ny] != null)
                         break;
                     j++;

@@ -15,7 +15,7 @@ namespace ChessModel
 
 #region public methods
         public Rook(Player p, int x, int y)
-            :base (p, 300, x, y)
+            :base (p, 500, x, y)
         {
 
         }
@@ -54,7 +54,7 @@ namespace ChessModel
                 {
                     int nx = X + _dx[i] * j;
                     int ny = Y + _dy[i] * j;
-                    if (_board[(nx<<3) + ny] == f) return true;
+                    if (ReferenceEquals(_board[(nx<<3) + ny], f)) return true;
                     if (_board[(nx<<3) + ny] != null)
                         break;
                     j++;

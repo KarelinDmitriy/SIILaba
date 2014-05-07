@@ -15,7 +15,7 @@ namespace ChessModel
 
 #region public methods
         public Knight(Player p, int x, int y)
-            : base(p, 200, x,y)
+            : base(p, 300, x,y)
         {
 
         }
@@ -46,7 +46,7 @@ namespace ChessModel
                 if ((((X + _dx[i]) & (int.MaxValue - 7)) == 0) &&
                          ((Y + _dy[i]) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[((X + _dx[i])<<3) + Y + _dy[i]] == f) return true;
+                    if (ReferenceEquals(_board[((X + _dx[i])<<3) + Y + _dy[i]], f)) return true;
                 }
             }
             return false;
