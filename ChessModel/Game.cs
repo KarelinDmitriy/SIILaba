@@ -95,11 +95,15 @@ namespace ChessModel
                 Figure fStep = _board[(move.fx<<3)+move.fy]; //фигура, которой ходят
                 _board[(move.tx<<3)+move.ty] = fStep;
                 _board[(move.fx<<3)+move.fy] = null;
+                fStep.X = move.tx;
+                fStep.Y = move.ty;
                 //ход сделали, теперь пытаемя проведить, а не шах ли нам после этого
                 var kingAlert = countAtacksToFigure(ownKing);
                 if (kingAlert == 0) ret.Add(move);
                 _board[(move.tx<<3)+move.ty] = fLast;
                 _board[(move.fx<<3)+move.fy] = fStep;
+                fStep.X = move.fx;
+                fStep.Y = move.fy;
             }
             return ret;
         }

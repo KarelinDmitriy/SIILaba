@@ -15,6 +15,9 @@ namespace ChessGame
             Game._board = Figure._board;
             AI._board = Figure._board;
             Move._board = Figure._board;
+            Queen.PrecalcStep();
+            Bishop.PrecalcStep();
+            Rook.PrecalcStep();
             //Создаем пешек
             for (int i = 0; i < 8; i++)
             {
