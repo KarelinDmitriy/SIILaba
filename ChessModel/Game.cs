@@ -36,12 +36,27 @@ namespace ChessModel
                                                 x.fy == s.fy &&
                                                 x.tx == s.tx &&
                                                 x.ty == s.ty);
-           // if (yes == null)
-             //   throw new ErrorStepExveption("Не возможно совершить ход");
+             if (yes == null)
+                throw new ErrorStepExveption("Не возможно совершить ход");
             _board[(s.tx<<3)+s.ty] = _board[(s.fx<<3)+s.fy];
             _board[(s.fx<<3)+s.fy] = null;
-            _board[(s.tx<<3)+s.ty].X = s.tx;
-            _board[(s.tx<<3)+s.ty].Y = s.ty;
+            if (_board[(s.tx << 3) + s.ty] is Pawn)
+            {
+                if (_board[(s.tx << 3) + s.ty].Player == ChessModel.Player.White && s.tx == 7)
+                    new Queen(ChessModel.Player.White, s.tx, s.ty);
+                else if ((_board[(s.tx << 3) + s.ty].Player == ChessModel.Player.Black && s.tx == 0))
+                    new Queen(ChessModel.Player.Black, s.tx, s.ty);
+                else
+                {
+                    _board[(s.tx << 3) + s.ty].X = s.tx;
+                    _board[(s.tx << 3) + s.ty].Y = s.ty;
+                }
+            }
+            else
+            {
+                _board[(s.tx << 3) + s.ty].X = s.tx;
+                _board[(s.tx << 3) + s.ty].Y = s.ty;
+            }
             _player = getEnemy(_player);
         }
 
@@ -118,7 +133,7 @@ namespace ChessModel
             {
                 if (x !=null && x.Player!=f.Player)
                 {
-                    if (x.attackTarget(f)) count++;
+                    if (x.attackTarget(f)) return 1;
                 }
             }
             return count;

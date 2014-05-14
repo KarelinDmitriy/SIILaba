@@ -63,6 +63,17 @@ namespace ChessModel
             get { return _ty; }
             set { _ty = value; } 
         }
+
+        public override string ToString()
+        {
+            string a = "";
+            a += (fx + 1).ToString();
+            a += (char)('a' + fy);
+            a += " - ";
+            a += (tx + 1).ToString();
+            a += (char)('a' + ty);
+            return a;
+        }
 #endregion
 
 #region private methods

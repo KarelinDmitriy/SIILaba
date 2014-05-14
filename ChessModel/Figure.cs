@@ -54,6 +54,8 @@ namespace ChessModel
         {
             get { return _player; }
         }
+
+        public abstract string PictureName();
 #endregion
 
 #region private methods

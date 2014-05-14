@@ -56,6 +56,12 @@ namespace ChessModel
         {
             return _player == ChessModel.Player.White ? "K" : "k";
         }
+
+        public override string PictureName()
+        {
+            if (_player == ChessModel.Player.Black) return "BlackKing";
+            else return "WhiteKing";
+        }
         #endregion
 
         #region private methods

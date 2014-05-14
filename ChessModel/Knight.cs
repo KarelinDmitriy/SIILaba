@@ -28,11 +28,10 @@ namespace ChessModel
                 if ((((X + _dx[i] ) & (int.MaxValue - 7)) == 0) &&
                          ((Y + _dy[i] ) & (int.MaxValue - 7)) == 0)
                 {
-                    int nx = X + _dx[i];
-                    int ny = Y + _dy[i];
-                    if (_board[(nx<<3) + ny]==null || _board[(nx<<3) + ny].isEnemy(this))
+                    int nc = ((X + _dx[i])<<3) + Y + _dy[i];
+                    if (_board[nc]==null || _board[nc].isEnemy(this))
                     {
-                        ret.Add(new Step(X, Y, nx, ny));
+                        ret.Add(new Step(X, Y, nc/8, nc%8));
                     }
                 }
             }
@@ -55,6 +54,12 @@ namespace ChessModel
         public override string ToString()
         {
             return _player == ChessModel.Player.White ? "H" : "h";
+        }
+
+        public override string PictureName()
+        {
+            if (_player == ChessModel.Player.White) return "WhiteKnight";
+            else return "BlackKnight";
         }
 #endregion
 

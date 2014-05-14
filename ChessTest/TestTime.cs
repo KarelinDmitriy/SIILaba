@@ -44,6 +44,8 @@ namespace ChessTest
             {
                 var g = new Game();
                 var steps = g.getAllLegalMoves(Player.White);
+                int a = steps.Count();
+                a++;
             }
         }
 
@@ -118,7 +120,11 @@ namespace ChessTest
 
             AI ai = new AI();
 
-            var x = ai.selectMove(Player.White, 6);
+            Game g = new Game();
+
+            g.doMove(new Step(1, 3, 2, 3));
+
+            var x = ai.selectMove(Player.Black, 6);
 
         }
 

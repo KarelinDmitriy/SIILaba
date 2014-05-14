@@ -27,15 +27,14 @@ namespace ChessModel
                 while ((((X + _dx[i] * j) & (int.MaxValue-7)) == 0) && 
                         ((Y + _dy[i] * j) & (int.MaxValue-7)) == 0)
                 {
-                    int nx = X + _dx[i] * j;
-                    int ny = Y + _dy[i] * j;
-                    if (_board[(nx<<3) + ny] != null)
+                    int nc = ((X + _dx[i] * j)<<3) + Y + _dy[i] * j;
+                    if (_board[nc] != null)
                     {
-                        if (_board[(nx<<3) + ny].Player!=_player)
-                            ret.Add(new Step(X, Y, nx, ny));
+                        if (_board[nc].Player!=_player)
+                            ret.Add(new Step(X, Y, nc/8, nc%8));
                         break;
                     }
-                    ret.Add(new Step(X, Y, nx, ny));
+                    ret.Add(new Step(X, Y, nc / 8, nc % 8));
                     j++;
                 }
             }
@@ -50,10 +49,9 @@ namespace ChessModel
                 while ((((X + _dx[i] * j) & (int.MaxValue - 7)) == 0) &&
                        ((Y + _dy[i] * j) & (int.MaxValue - 7)) == 0)
                 {
-                    int nx = X + _dx[i] * j;
-                    int ny = Y + _dy[i] * j;
-                    if (ReferenceEquals(_board[(nx<<3) + ny], f)) return true;
-                    if (_board[(nx<<3) + ny] != null)
+                    int nc = ((X + _dx[i] * j)<<3) + Y + _dy[i] * j;
+                    if (ReferenceEquals(_board[nc], f)) return true;
+                    if (ReferenceEquals(_board[nc],null))
                         break;
                     j++;
                 }
@@ -64,6 +62,12 @@ namespace ChessModel
         public override string ToString()
         {
             return _player == ChessModel.Player.White ? "Q" : "q";
+        }
+
+        public override string PictureName()
+        {
+            if (_player == ChessModel.Player.White) return "WhiteQueen";
+            else return "BlackQueen";
         }
         #endregion
 
