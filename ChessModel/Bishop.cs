@@ -10,7 +10,7 @@ namespace ChessModel
     {
 #region variable
         static readonly int[] _dx = { 1, 1, -1, -1 };
-        static readonly int[] _dy = { 1, -1, 1, -1 };
+        static readonly int[] _dy = { 1, -1, 1, -1 }; 
         static StepFromPosition[] pSteps = new StepFromPosition[64]; //препросчитанные шаги
 #endregion 
 
