@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace ChessModel
 {
-    public class AI
+    public sealed class AI
     {
         #region variable
         Stack<Move> _moves;
         public static Figure[] _board;
         Game _g;
+        public long Count;
         #endregion
 
         #region public methods
@@ -19,10 +20,11 @@ namespace ChessModel
         {
             _moves = new Stack<Move>();
             _g = new Game();
+            Count = 0;
         }
 
         //выбирает ход для выбранного игрока с глубиной не более maxDeep
-        public Step selectMove(Player p, int maxDeep)
+        public Step SelectMove(Player p, int maxDeep)
         {
             var moves = _g.getAllLegalMoves(p);
             int[] vMoves = new Int32[moves.Count()];
@@ -32,9 +34,9 @@ namespace ChessModel
                 foreach (var x in moves)
                 {
                     int res;
-                    doMove(x);
-                    res = alphaBetaBlack(Int32.MinValue, Int32.MaxValue, maxDeep-1);
-                    backMove();
+                    DoMove(x);
+                    res = AlphaBetaBlack(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
+                    BackMove();
                     vMoves[i++] = res;
                 }
             }
@@ -44,19 +46,19 @@ namespace ChessModel
                 foreach (var x in moves)
                 {
                     int res;
-                    doMove(x);
-                    res = alphaBetaWhite(Int32.MinValue, Int32.MaxValue, maxDeep-1);
-                    backMove();
+                    DoMove(x);
+                    res = AlphaBetaWhite(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
+                    BackMove();
                     vMoves[i++] = res;
                 }
             }
-            int Max = vMoves[0], maxIdx = 0;
+            int max = vMoves[0], maxIdx = 0;
             for (int i = 1; i < vMoves.Length; i++)
             {
-                if (vMoves[i] > Max)
+                if (vMoves[i] > max)
                 {
-                    
-                    Max = vMoves[i];
+
+                    max = vMoves[i];
                     maxIdx = i;
                 }
             }
@@ -65,38 +67,54 @@ namespace ChessModel
         #endregion
 
         #region private methods
-        int alphaBetaWhite(int alpha, int beta, int depth)
+        int AlphaBetaWhite(int alpha, int beta, int depth)
         {
-            int tmp;
+            Count++;
             int max = Int32.MinValue;
             if (depth <= 0) return calculateScoreWhite() - calculateScoreBlack();
             var moves = _g.getAllLegalMoves(Player.White);
-            foreach (var x in moves)
+            if (moves.Count() != 0)
+                foreach (var x in moves)
+                {
+                    DoMove(x);
+                    int tmp = AlphaBetaBlack(alpha, beta, depth - 1);
+                    BackMove();
+                    if (tmp > max) max = tmp;
+                    if (tmp > alpha) alpha = tmp;
+                    if (max >= beta) return max;
+                }
+            else
             {
-                doMove(x);
-                tmp = alphaBetaBlack(alpha, beta, depth - 1);
-                backMove();
-                if (tmp > max) max = tmp;
-                if (tmp > alpha) alpha = tmp;
-                if (max >= beta) return max;
+                var state = _g.calcState();
+                if (state == State.Checkmate)
+                    return 0;
+                else return -10000;
             }
             return max;
         }
 
-        private int alphaBetaBlack(int alpha, int beta, int depth)
+        private int AlphaBetaBlack(int alpha, int beta, int depth)
         {
-            int tmp;
+            Count++;
             int min = Int32.MaxValue;
             if (depth <= 0) return calculateScoreBlack() - calculateScoreWhite();
             var moves = _g.getAllLegalMoves(Player.Black);
-            foreach (var x in moves)
+            if (moves.Count() != 0)
+                foreach (var x in moves)
+                {
+                    DoMove(x);
+                    int tmp = AlphaBetaWhite(alpha, beta, depth - 1);
+                    BackMove();
+                    if (tmp < min) min = tmp;
+                    if (tmp < beta) beta = tmp;
+                    if (min <= alpha) return min;
+                }
+            else
             {
-                doMove(x);
-                tmp = alphaBetaWhite(alpha, beta, depth - 1);
-                backMove();
-                if (tmp < min) min = tmp;
-                if (tmp < beta) beta = tmp;
-                if (min <= alpha) return min;
+                var state = _g.calcState();
+                if (state == State.Checkmate)
+                    return 0;
+                else return 10000;
             }
             return min;
         }
@@ -127,7 +145,7 @@ namespace ChessModel
 
         //делает ход и заносит в стек информацию
         //о том, что необходимо для его отмены 
-        void doMove(Step step)
+        void DoMove(Step step)
         {
             Move m = new Move(step);
             _moves.Push(m);
@@ -153,7 +171,7 @@ namespace ChessModel
         }
 
         //отменяет последний ход в стеке
-        void backMove()
+        void BackMove()
         {
             Move m = _moves.Pop();
             _board[(m.step.fx << 3) + m.step.fy] = m.fFrom;

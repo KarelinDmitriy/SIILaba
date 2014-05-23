@@ -98,7 +98,7 @@ namespace ConsoleTestChess
                 {
                     Stopwatch tim = new Stopwatch();
                     tim.Start();
-                    st = ai.selectMove(g.Player, 6);
+                    st = ai.SelectMove(g.Player, 6);
                     tim.Stop();
                     Console.WriteLine(tim.ElapsedMilliseconds);
                     Console.WriteLine();

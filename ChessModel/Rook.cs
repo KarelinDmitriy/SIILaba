@@ -21,7 +21,7 @@ namespace ChessModel
 
         }
 
-        public override IEnumerable<Step> getRightMove()
+        public override IEnumerable<Step> GetRightMove()
         {
             List<Step> ret = new List<Step>();
             StepFromPosition from = pSteps[(X << 3) + Y];
@@ -47,7 +47,7 @@ namespace ChessModel
             return ret;
         }
 
-        public override bool attackTarget(Figure f)
+        public override bool AttackTarget(Figure f)
         {
             int t = (f.X << 3) + f.Y;
             StepFromPosition p = pSteps[(X << 3) + Y];
@@ -70,12 +70,12 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return _player == ChessModel.Player.White ? "R" : "r";
+            return _player == Player.White ? "R" : "r";
         }
 
         public override string PictureName()
         {
-            if (_player == ChessModel.Player.White) return "WhiteRook";
+            if (_player == Player.White) return "WhiteRook";
             else return "BlackRook";
         }
 

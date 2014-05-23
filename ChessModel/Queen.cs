@@ -19,7 +19,7 @@ namespace ChessModel
             : base(p, 900, x, y)
         { }
 
-        public override IEnumerable<Step> getRightMove()
+        public override IEnumerable<Step> GetRightMove()
         {
             List<Step> ret = new List<Step>();
             StepFromPosition from = pSteps[(X << 3) + Y];
@@ -32,7 +32,6 @@ namespace ChessModel
                     {
                         ret.Add(cur.step);
                         cur = cur.NextRay;
-                        continue;
                     }
                     else
                     {
@@ -45,7 +44,7 @@ namespace ChessModel
             return ret;
         }
 
-        public override bool attackTarget(Figure f)
+        public override bool AttackTarget(Figure f)
         {
             int t = (f.X << 3) + f.Y;
             StepFromPosition p = pSteps[(X << 3) + Y];
@@ -56,11 +55,8 @@ namespace ChessModel
                 while (cur != null)
                 {
                     if (cur.step.tx == f.X && cur.step.ty == f.Y) return true;
-                    else
-                    {
-                        if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
-                        cur = cur.NextRay;
-                    }
+                    if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
+                    cur = cur.NextRay;
                 }
             }
             return false;
@@ -68,13 +64,13 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return _player == ChessModel.Player.White ? "Q" : "q";
+            return _player == Player.White ? "Q" : "q";
         }
 
         public override string PictureName()
         {
-            if (_player == ChessModel.Player.White) return "WhiteQueen";
-            else return "BlackQueen";
+            if (_player == Player.White) return "WhiteQueen";
+            return "BlackQueen";
         }
 
         public static void PrecalcStep()

@@ -18,11 +18,11 @@ namespace ChessModel
             
         }
 
-        public override IEnumerable<Step> getRightMove()
+        public override IEnumerable<Step> GetRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((
             List<Step> ret = new List<Step>();
-            if (_player == ChessModel.Player.White)
+            if (_player == Player.White)
             {
                 //считаем, что пешка не можешь быть на позиции х = 7, 
                 //тогда любой ход вперед может допустим, если следующая
@@ -39,13 +39,13 @@ namespace ChessModel
                 //опять же предполагаем, что мы не можем находиться на х = 7
                 if (((Y - 1) & Int32.MaxValue - 7) == 0
                     && _board[((X + 1) << 3) + (Y - 1)] != null
-                    && _board[((X + 1) << 3) + (Y - 1)].Player == ChessModel.Player.Black)
+                    && _board[((X + 1) << 3) + (Y - 1)].Player == Player.Black)
                 {
                     ret.Add(new Step(X, Y, X + 1, Y - 1));
                 }
                 if (((Y + 1) & Int32.MaxValue - 7) == 0
                     && _board[((X + 1) << 3) + (Y + 1)] != null
-                    && _board[((X + 1) << 3) + (Y + 1)].Player == ChessModel.Player.Black)
+                    && _board[((X + 1) << 3) + (Y + 1)].Player == Player.Black)
                 {
                     ret.Add(new Step(X, Y, X + 1, Y + 1));
                 }
@@ -67,13 +67,13 @@ namespace ChessModel
                 //опять же предполагаем, что мы не можем находиться на х = 0
                 if (((Y - 1) & Int32.MaxValue - 7) == 0
                     && _board[((X - 1) << 3) + (Y - 1)] != null
-                    && _board[((X - 1) << 3) + (Y - 1)].Player == ChessModel.Player.White)
+                    && _board[((X - 1) << 3) + (Y - 1)].Player == Player.White)
                 {
                     ret.Add(new Step(X, Y, X - 1, Y - 1));
                 }
                 if (((Y + 1) & Int32.MaxValue - 7) == 0
                     && _board[((X - 1) << 3) + (Y + 1)] != null
-                    && _board[((X - 1) << 3) + (Y + 1)].Player == ChessModel.Player.White)
+                    && _board[((X - 1) << 3) + (Y + 1)].Player == Player.White)
                 {
                     ret.Add(new Step(X, Y, X - 1, Y + 1));
                 }
@@ -81,9 +81,9 @@ namespace ChessModel
             return ret;
         }
 
-        public override bool attackTarget(Figure f)
+        public override bool AttackTarget(Figure f)
         {
-            if (_player == ChessModel.Player.White)
+            if (_player == Player.White)
             {
                 if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
                        ((Y + 1) & (int.MaxValue - 7)) == 0)
@@ -114,12 +114,12 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return _player == ChessModel.Player.White ? "P" : "p";
+            return _player == Player.White ? "P" : "p";
         }
 
         public override string PictureName()
         {
-            if (_player == ChessModel.Player.White) return "WhitePawn";
+            if (_player == Player.White) return "WhitePawn";
             else return "BlackPawn";
         }
         #endregion

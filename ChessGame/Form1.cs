@@ -50,7 +50,7 @@ namespace ChessGame
             //определяем контекст
             context = BufferedGraphicsManager.Current;
             //определяем размер контекста
-            context.MaximumBuffer = new System.Drawing.Size(panel.Width + 1, panel.Height + 1);
+            context.MaximumBuffer = new Size(panel.Width + 1, panel.Height + 1);
             Rectangle rec = new Rectangle(0, 0, panel.Width, panel.Height);
             //на основе контекста создаем буфер
             buffer = context.Allocate(e.Graphics, rec);
@@ -87,7 +87,7 @@ namespace ChessGame
                 Brush green = new SolidBrush(Color.GreenYellow);
                 buffer.Graphics.FillRectangle(green, 70 * sy, 70 * (7 - sx), 70, 70);
                 buffer.Graphics.DrawRectangle(whiteP,70 * sy, 70 * (7 - sx), 70, 70);
-                var steps = Figure._board[(sx << 3) + sy].getRightMove();
+                var steps = Figure._board[(sx << 3) + sy].GetRightMove();
                 Brush blue = new SolidBrush(Color.BlueViolet);
                 Brush red = new SolidBrush(Color.Red);
                 foreach (var x in steps)
@@ -175,7 +175,8 @@ namespace ChessGame
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            if (comboBox1.SelectedIndex == 0) tWhite = TypeOfGamer.Human;
+            else tWhite = TypeOfGamer.AI;
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -200,14 +201,15 @@ namespace ChessGame
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            Step s = _ai.selectMove((Player)p, 6);
+            Step s = _ai.SelectMove((Player)p, 4);
             _game.doMove(s);
              addStepForHistory(s);
             _lastStep = s;
             ThreadEnd();
             timer.Stop();
             if (labelTime.InvokeRequired)
-                labelTime.BeginInvoke(new Action<string>(x => labelTime.Text = x), timer.ElapsedMilliseconds.ToString());
+                labelTime.BeginInvoke(new Action<string>(x => labelTime.Text = x), timer.ElapsedMilliseconds.ToString()+
+                    " Просмотренно узлов: " + _ai.Count.ToString());
             else labelTime.Text = timer.ElapsedMilliseconds.ToString();
         }
 

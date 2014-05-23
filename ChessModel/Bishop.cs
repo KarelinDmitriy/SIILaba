@@ -21,7 +21,7 @@ namespace ChessModel
 
         }
 
-        public override IEnumerable<Step> getRightMove()
+        public override IEnumerable<Step> GetRightMove()
         {
             List<Step> ret = new List<Step>();
             StepFromPosition from = pSteps[(X << 3) + Y];
@@ -34,7 +34,6 @@ namespace ChessModel
                     {
                         ret.Add(cur.step);
                         cur = cur.NextRay;
-                        continue;
                     }
                     else
                     {
@@ -47,22 +46,19 @@ namespace ChessModel
             return ret;
         }
 
-        public override bool attackTarget(Figure f)
+        public override bool AttackTarget(Figure f)
         {
             int t = (f.X << 3) + f.Y;
             StepFromPosition p = pSteps[(X << 3) + Y];
             if (p.Attack.ContainsKey(t))
             {
                 int r = p.Attack[t];
-                Ray cur = p.Rays[r];
+                var cur = p.Rays[r];
                 while (cur != null)
                 {
                     if (cur.step.tx == f.X && cur.step.ty == f.Y) return true;
-                    else
-                    {
-                        if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
-                        cur = cur.NextRay;
-                    }
+                    if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
+                    cur = cur.NextRay;
                 }
             }
             return false;
@@ -70,13 +66,12 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return _player == ChessModel.Player.White ? "B" : "b";
+            return _player == Player.White ? "B" : "b";
         }
 
         public override string PictureName()
         {
-            if (_player == ChessModel.Player.Black) return "BlackBishop";
-            else return "WhiteBishop";
+            return _player == Player.Black ? "BlackBishop" : "WhiteBishop";
         }
 
         public static void PrecalcStep()

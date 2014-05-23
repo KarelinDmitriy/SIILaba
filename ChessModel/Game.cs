@@ -42,10 +42,10 @@ namespace ChessModel
             _board[(s.fx<<3)+s.fy] = null;
             if (_board[(s.tx << 3) + s.ty] is Pawn)
             {
-                if (_board[(s.tx << 3) + s.ty].Player == ChessModel.Player.White && s.tx == 7)
-                    new Queen(ChessModel.Player.White, s.tx, s.ty);
-                else if ((_board[(s.tx << 3) + s.ty].Player == ChessModel.Player.Black && s.tx == 0))
-                    new Queen(ChessModel.Player.Black, s.tx, s.ty);
+                if (_board[(s.tx << 3) + s.ty].Player == Player.White && s.tx == 7)
+                    new Queen(Player.White, s.tx, s.ty);
+                else if ((_board[(s.tx << 3) + s.ty].Player == Player.Black && s.tx == 0))
+                    new Queen(Player.Black, s.tx, s.ty);
                 else
                 {
                     _board[(s.tx << 3) + s.ty].X = s.tx;
@@ -123,7 +123,7 @@ namespace ChessModel
             {
                 if (x != null && x.Player==p)
                 {
-                    var IE = x.getRightMove();
+                    var IE = x.GetRightMove();
                     ret.AddRange(IE);
                 }
             }
@@ -137,7 +137,7 @@ namespace ChessModel
             {
                 if (x !=null && x.Player!=f.Player)
                 {
-                    if (x.attackTarget(f)) return 1;
+                    if (x.AttackTarget(f)) return 1;
                 }
             }
             return count;

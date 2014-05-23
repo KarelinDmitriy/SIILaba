@@ -18,6 +18,8 @@ namespace ChessGame
             Queen.PrecalcStep();
             Bishop.PrecalcStep();
             Rook.PrecalcStep();
+            King.preaCalc();
+            Knight.preaCalc();
             //Создаем пешек
             for (int i = 0; i < 8; i++)
             {

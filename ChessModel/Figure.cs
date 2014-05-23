@@ -25,8 +25,8 @@ namespace ChessModel
             _board[(x<<3) + y] = this;
         }
 
-        public abstract IEnumerable<Step> getRightMove();
-        public abstract bool attackTarget(Figure f);
+        public abstract IEnumerable<Step> GetRightMove();
+        public abstract bool AttackTarget(Figure f);
 
         public int Cost
         {
@@ -45,7 +45,7 @@ namespace ChessModel
             set;
         }
 
-        public bool isEnemy(Figure f)
+        public bool IsEnemy(Figure f)
         {
             return f._player != _player;
         }
@@ -66,7 +66,7 @@ namespace ChessModel
         protected bool RightMove(int x, int y)
         {
             if (_board[(x<<3)+y] == null ||
-                _board[(x<<3)+y].isEnemy(this))
+                _board[(x<<3)+y].IsEnemy(this))
             {
                 return true;
             }
