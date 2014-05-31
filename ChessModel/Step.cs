@@ -36,10 +36,10 @@ namespace ChessModel
 
         public static Step stringToStep(string a)
         {
-            int y1 = a[0] - 'a';
-            int x1 = int.Parse(a[1]+"")-1;
-            int y2 = a[2] - 'a';
-            int x2 = int.Parse(a[3] + "")-1;
+            var y1 = a[0] - 'a';
+            var x1 = int.Parse(a[1]+"")-1;
+            var y2 = a[2] - 'a';
+            var x2 = int.Parse(a[3] + "")-1;
             return new Step(x1, y1, x2, y2);
         }
 
@@ -66,7 +66,7 @@ namespace ChessModel
 
         public override string ToString()
         {
-            string a = "";
+            var a = "";
             a += (fx + 1).ToString();
             a += (char)('a' + fy);
             a += " - ";

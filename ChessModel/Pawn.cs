@@ -18,10 +18,10 @@ namespace ChessModel
             
         }
 
-        public override IEnumerable<Step> GetRightMove()
+        public override List<Step> GetRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((
-            List<Step> ret = new List<Step>();
+            var ret = new List<Step>();
             if (_player == Player.White)
             {
                 //считаем, что пешка не можешь быть на позиции х = 7, 

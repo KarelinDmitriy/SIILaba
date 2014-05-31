@@ -11,7 +11,7 @@ namespace ChessModel
 #region variable
         public static Figure[] _board;
         protected static Game _game;
-        private int _cost;
+        private readonly int _cost;
         protected Player _player;
 #endregion 
 
@@ -25,7 +25,7 @@ namespace ChessModel
             _board[(x<<3) + y] = this;
         }
 
-        public abstract IEnumerable<Step> GetRightMove();
+        public abstract List<Step> GetRightMove();
         public abstract bool AttackTarget(Figure f);
 
         public int Cost

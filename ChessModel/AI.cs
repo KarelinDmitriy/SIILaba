@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,57 +29,57 @@ namespace ChessModel
         public Step SelectMove(Player p, int maxDeep)
         {
             var moves = _g.getAllLegalMoves(p);
-            int[] vMoves = new Int32[moves.Count()];
+            var vMoves = new Int32[moves.Count];
             if (p == Player.White)
             {
-                int i = 0;
+                var i = 0;
                 foreach (var x in moves)
                 {
-                    int res;
                     DoMove(x);
-                    res = AlphaBetaBlack(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
+                    int res = AlphaBetaBlackWS(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
                     BackMove();
                     vMoves[i++] = res;
                 }
             }
             else
             {
-                int i = 0;
+                var i = 0;
                 foreach (var x in moves)
                 {
-                    int res;
                     DoMove(x);
-                    res = AlphaBetaWhite(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
+                    int res = AlphaBetaWhiteBS(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
                     BackMove();
                     vMoves[i++] = res;
                 }
             }
-            int max = vMoves[0], maxIdx = 0;
-            for (int i = 1; i < vMoves.Length; i++)
+            var max = vMoves.Max();
+            var arrMoves = moves.ToArray();
+            var bestSteps = new List<Step>();
+            for (var i = 0; i < vMoves.Length; i++)
             {
-                if (vMoves[i] > max)
-                {
-
-                    max = vMoves[i];
-                    maxIdx = i;
-                }
+                if (vMoves[i] == max)
+                    bestSteps.Add(arrMoves[i]);
             }
-            return moves.ToArray()[maxIdx];
+            var rand = new Random();
+            return bestSteps[rand.Next() % bestSteps.Count];
         }
         #endregion
 
         #region private methods
-        int AlphaBetaWhite(int alpha, int beta, int depth)
+
+        #region White Step First
+
+        private int AlphaBetaWhiteWS(int alpha, int beta, int depth)
         {
             Count++;
-            int max = Int32.MinValue;
+            var max = Int32.MinValue;
             if (depth <= 0) return calculateScoreWhite() - calculateScoreBlack();
             var moves = _g.getAllLegalMoves(Player.White);
             if (moves.Count() != 0)
                 foreach (var x in moves)
                 {
                     DoMove(x);
-                    int tmp = AlphaBetaBlack(alpha, beta, depth - 1);
+                    var tmp = AlphaBetaBlackWS(alpha, beta, depth - 1);
                     BackMove();
                     if (tmp > max) max = tmp;
                     if (tmp > alpha) alpha = tmp;
@@ -93,17 +95,17 @@ namespace ChessModel
             return max;
         }
 
-        private int AlphaBetaBlack(int alpha, int beta, int depth)
+        private int AlphaBetaBlackWS(int alpha, int beta, int depth)
         {
             Count++;
-            int min = Int32.MaxValue;
+            var min = Int32.MaxValue;
             if (depth <= 0) return calculateScoreBlack() - calculateScoreWhite();
             var moves = _g.getAllLegalMoves(Player.Black);
             if (moves.Count() != 0)
                 foreach (var x in moves)
                 {
                     DoMove(x);
-                    int tmp = AlphaBetaWhite(alpha, beta, depth - 1);
+                    var tmp = AlphaBetaWhiteWS(alpha, beta, depth - 1);
                     BackMove();
                     if (tmp < min) min = tmp;
                     if (tmp < beta) beta = tmp;
@@ -119,11 +121,90 @@ namespace ChessModel
             return min;
         }
 
+        #endregion
+
+        #region Black Step First
+
+        private int AlphaBetaWhiteBS(int alpha, int beta, int depth)
+        {
+            Count++;
+            var min = Int32.MaxValue;
+            if (depth <= 0)
+            {
+                var state = _g.calcState(Player.White);
+                switch (state)
+                {
+                    case State.Calm:
+                        return calculateScoreWhite() - calculateScoreBlack();
+                        break;
+                    case State.Check:
+                        return calculateScoreWhite() - calculateScoreBlack() - 300 ;
+                        break;
+                    case State.Checkmate:
+                        return Int32.MinValue;
+                        break;
+                    case State.Draw:
+                        return 0;
+                        break;
+                }
+            }
+            var moves = _g.getAllLegalMoves(Player.White);
+            foreach (var x in moves)
+            {
+                DoMove(x);
+                var tmp = AlphaBetaBlackBS(alpha, beta, depth - 1);
+                BackMove();
+                if (tmp < min) min = tmp;
+                if (tmp < beta) beta = tmp;
+                if (min <= alpha) return min;
+            }
+            return min;
+        }
+
+        private int AlphaBetaBlackBS(int alpha, int beta, int depth)
+        {
+            Count++;
+            var max = Int32.MinValue;
+            if (depth <= 0)
+            {
+                var state = _g.calcState(Player.White);
+                switch (state)
+                {
+                    case State.Calm:
+                        return calculateScoreBlack() - calculateScoreWhite();
+                        break;
+                    case State.Check:
+                        return calculateScoreBlack()- 300-calculateScoreWhite()   ;
+                        break;
+                    case State.Checkmate:
+                        return Int32.MaxValue;
+                        break;
+                    case State.Draw:
+                        return 0;
+                        break;
+                }
+            }
+            var moves = _g.getAllLegalMoves(Player.Black);
+            foreach (var x in moves)
+            {
+                DoMove(x);
+                var tmp = AlphaBetaWhiteBS(alpha, beta, depth - 1);
+                BackMove();
+                if (tmp > max) max = tmp;
+                if (tmp > alpha) alpha = tmp;
+                if (max >= beta) return max;
+            }
+            return max;
+        }
+
+        #endregion
+
+
         //посчитать счет белых (пока не самым оптимальный способ)
         int calculateScoreWhite()
         {
-            int sum = 0;
-            for (int i = 0; i < _board.Length; i++)
+            var sum = 0;
+            for (var i = 0; i < _board.Length; i++)
             {
                 if (_board[i] != null && _board[i].Player == Player.White)
                     sum += _board[i].Cost;
@@ -134,8 +215,8 @@ namespace ChessModel
         //посчитать счет черных (пока не самым оптимальный способ)
         int calculateScoreBlack()
         {
-            int sum = 0;
-            for (int i = 0; i < _board.Length; i++)
+            var sum = 0;
+            for (var i = 0; i < _board.Length; i++)
             {
                 if (_board[i] != null && _board[i].Player == Player.Black)
                     sum += _board[i].Cost;
@@ -147,7 +228,7 @@ namespace ChessModel
         //о том, что необходимо для его отмены 
         void DoMove(Step step)
         {
-            Move m = new Move(step);
+            var m = new Move(step);
             _moves.Push(m);
             _board[(step.tx << 3) + step.ty] = m.fFrom;
             _board[(step.fx << 3) + step.fy] = null;
@@ -173,7 +254,7 @@ namespace ChessModel
         //отменяет последний ход в стеке
         void BackMove()
         {
-            Move m = _moves.Pop();
+            var m = _moves.Pop();
             _board[(m.step.fx << 3) + m.step.fy] = m.fFrom;
             _board[(m.step.tx << 3) + m.step.ty] = m.fOut;
             m.fFrom.X = m.step.fx;

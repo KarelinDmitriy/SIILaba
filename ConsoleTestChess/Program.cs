@@ -14,10 +14,10 @@ namespace ConsoleTestChess
         {
             Console.WriteLine("  A B C D E F G H");
             Console.WriteLine();
-            for (int i=0; i<8; i++)
+            for (var i=0; i<8; i++)
             {
                 Console.Write((i + 1).ToString() + " ");
-                for (int j=0; j<8; j++)
+                for (var j=0; j<8; j++)
                 {
                     if (board[(i<<3) + j] == null) Console.Write(". ");
                     else Console.Write(board[(i<<3) + j].ToString()+" ");
@@ -56,7 +56,7 @@ namespace ConsoleTestChess
             //new Rook(Player.White, 0, 7);
             //new Rook(Player.Black, 7, 7);
 
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 new Pawn(Player.White, 1, i);
                 new Pawn(Player.Black, 6, i);
@@ -78,9 +78,9 @@ namespace ConsoleTestChess
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            Game g = new Game();
-            AI ai = new AI();
-            State s = State.Calm;
+            var g = new Game();
+            var ai = new AI();
+            var s = State.Calm;
 
             while (s != State.Checkmate)
             {
@@ -91,12 +91,12 @@ namespace ConsoleTestChess
                 Step st;
                 if (g.Player == Player.White)
                 {
-                    string step = Console.ReadLine();
+                    var step = Console.ReadLine();
                     st = Step.stringToStep(step);
                 }
                 else
                 {
-                    Stopwatch tim = new Stopwatch();
+                    var tim = new Stopwatch();
                     tim.Start();
                     st = ai.SelectMove(g.Player, 6);
                     tim.Stop();

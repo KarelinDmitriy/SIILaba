@@ -19,8 +19,8 @@ namespace ChessModel
         public Game()
         {
             _player = Player.White;
-            for (int i=0; i<8; i++)
-                for (int j=0; j<8; j++)
+            for (var i=0; i<8; i++)
+                for (var j=0; j<8; j++)
                     if (_board[(i<<3)+j] is King)
                     {
                         if (_board[(i<<3)+j].Player == Player.White)
@@ -65,7 +65,7 @@ namespace ChessModel
             Figure ownKing;
             if (_player== Player.White) ownKing = _whiteKing;
             else ownKing = _blackKing;
-            int kingAlert = countAtacksToFigure(ownKing);
+            var kingAlert = countAtacksToFigure(ownKing);
             var count = getAllLegalMoves(_player).Count();
             if (kingAlert == 0)
             {
@@ -79,9 +79,24 @@ namespace ChessModel
             }
         }
 
-        public IEnumerable<Step> getAllLegalMoves(Player p)
+        public State calcState(Player p)
         {
-            List<Step> ret = new List<Step>();
+            var ownKing = p == Player.White ? _whiteKing : _blackKing;
+            var kingAlert = countAtacksToFigure(ownKing);
+            var count = getAllLegalMoves(_player).Count();
+            if (kingAlert == 0)
+            {
+                return count == 0 ? State.Draw : State.Calm;
+            }
+            else
+            {
+                return count > 0 ? State.Check : State.Checkmate;
+            }
+        }
+
+        public List<Step> getAllLegalMoves(Player p)
+        {
+            var ret = new List<Step>();
             var moves = getAllRightMoves(p);
             //запоминаем, какого короля мы должны атаковать
             Figure ownKing;
@@ -91,8 +106,8 @@ namespace ChessModel
             {
                 //пытаемся делать ход+
                 Debug.Assert(ownKing != null);
-                Figure fLast = _board[(move.tx<<3)+move.ty]; //фигура, которая убирается с доски (возможно null)
-                Figure fStep = _board[(move.fx<<3)+move.fy]; //фигура, которой ходят
+                var fLast = _board[(move.tx<<3)+move.ty]; //фигура, которая убирается с доски (возможно null)
+                var fStep = _board[(move.fx<<3)+move.fy]; //фигура, которой ходят
                 _board[(move.tx<<3)+move.ty] = fStep;
                 _board[(move.fx<<3)+move.fy] = null;
                 fStep.X = move.tx;
@@ -116,9 +131,9 @@ namespace ChessModel
 
 #region private methods
 
-        public IEnumerable<Step> getAllRightMoves(Player p)
+        public List<Step> getAllRightMoves(Player p)
         {
-            List<Step> ret = new List<Step>();
+            var ret = new List<Step>();
             foreach (var x in _board)
             {
                 if (x != null && x.Player==p)
@@ -132,7 +147,6 @@ namespace ChessModel
 
         int countAtacksToFigure(Figure f)
         {
-            int count = 0;
             foreach (var x in _board)
             {
                 if (x !=null && x.Player!=f.Player)
@@ -140,7 +154,7 @@ namespace ChessModel
                     if (x.AttackTarget(f)) return 1;
                 }
             }
-            return count;
+            return 0;
         }
 
         private Player getEnemy(Player p)

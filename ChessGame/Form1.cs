@@ -21,7 +21,7 @@ namespace ChessGame
         private Game _game;
         private AI _ai;
         private Player _curPlayer;
-        private TypeOfGamer tWhite, tBlack; //тип белого/черного игрока
+        private TypeOfGamer _tWhite, _tBlack; //тип белого/черного игрока
         private Step _lastStep;
 
         public Form1()
@@ -33,8 +33,8 @@ namespace ChessGame
         {
             comboBox1.SelectedIndex = comboBox2.SelectedIndex = 0;
             Functions.InitDesk();
-            tWhite = TypeOfGamer.Human;
-            tBlack = TypeOfGamer.Human;
+            _tWhite = TypeOfGamer.Human;
+            _tBlack = TypeOfGamer.Human;
             _curPlayer = Player.White;
             _game = new Game();
             _ai = new AI();
@@ -42,25 +42,23 @@ namespace ChessGame
             pictureBox1.Invalidate();
         }
 
-        private void printBoard(Control panel, PaintEventArgs e)
+        private void PrintBoard(Control panel, PaintEventArgs e)
         {
             //создаем буффер и контекст для него
-            BufferedGraphics buffer;
-            BufferedGraphicsContext context;
             //определяем контекст
-            context = BufferedGraphicsManager.Current;
+            BufferedGraphicsContext context = BufferedGraphicsManager.Current;
             //определяем размер контекста
             context.MaximumBuffer = new Size(panel.Width + 1, panel.Height + 1);
-            Rectangle rec = new Rectangle(0, 0, panel.Width, panel.Height);
+            var rec = new Rectangle(0, 0, panel.Width, panel.Height);
             //на основе контекста создаем буфер
-            buffer = context.Allocate(e.Graphics, rec);
+            BufferedGraphics buffer = context.Allocate(e.Graphics, rec);
             //отрисовка чего то там
             Brush brushWhite = new SolidBrush(Color.White);
             Brush brushBlack = new SolidBrush(Color.Black);
-            Pen whiteP = new Pen(Color.White);
-            for (int i = 0; i < 8; i++)
+            var whiteP = new Pen(Color.White);
+            for (var i = 0; i < 8; i++)
             {
-                for (int j = 0; j < 8; j++)
+                for (var j = 0; j < 8; j++)
                 {
                     if ((j + i) % 2 == 1)
                     {
@@ -88,9 +86,19 @@ namespace ChessGame
                 buffer.Graphics.FillRectangle(green, 70 * sy, 70 * (7 - sx), 70, 70);
                 buffer.Graphics.DrawRectangle(whiteP,70 * sy, 70 * (7 - sx), 70, 70);
                 var steps = Figure._board[(sx << 3) + sy].GetRightMove();
+                var allSteps = _game.getAllLegalMoves(_curPlayer);
+                var rSteps = steps.Where(x =>
+                {
+                    var s = allSteps.FirstOrDefault(y => x.fx == y.fx &&
+                                                         x.fy == y.fy &&
+                                                         x.tx == y.tx &&
+                                                         x.ty == y.ty);
+                    return s != null;
+                }
+                    );
                 Brush blue = new SolidBrush(Color.BlueViolet);
                 Brush red = new SolidBrush(Color.Red);
-                foreach (var x in steps)
+                foreach (var x in rSteps)
                 {
                     if (Figure._board[(x.tx << 3) + x.ty] == null)
                         buffer.Graphics.FillRectangle(blue, x.ty * 70, (7 - x.tx) * 70, 70, 70);
@@ -99,14 +107,14 @@ namespace ChessGame
                     buffer.Graphics.DrawRectangle(whiteP, x.ty * 70, (7 - x.tx) * 70, 70, 70);
                 }
             }
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
-                for (int j = 0; j < 8; j++)
+                for (var j = 0; j < 8; j++)
                 {
                     if (Figure._board[(i << 3) + j] != null)
                     {
-                        string path = "Picture/" + Figure._board[(i << 3) + j].PictureName() + ".png";
-                        Image img = Image.FromFile(path);
+                        var path = "Picture/" + Figure._board[(i << 3) + j].PictureName() + ".png";
+                        var img = Image.FromFile(path);
                         buffer.Graphics.DrawImage(img, 70 * j, 70 * (7-i));
                     }
                 }
@@ -120,14 +128,13 @@ namespace ChessGame
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            printBoard(pictureBox1, e);
-            if (_curPlayer == Player.White && tWhite == TypeOfGamer.AI ||
-                      _curPlayer == Player.Black && tBlack == TypeOfGamer.AI)
+            PrintBoard(pictureBox1, e);
+            if (_curPlayer == Player.White && _tWhite == TypeOfGamer.AI ||
+                      _curPlayer == Player.Black && _tBlack == TypeOfGamer.AI)
             {
                 _isBlock = true;
                 stringState.Text = "Вычисление хода";
-                Thread thread = new Thread(AIStep);
-                thread.Priority = ThreadPriority.Highest;
+                var thread = new Thread(AIStep) {Priority = ThreadPriority.Highest};
                 thread.Start(_curPlayer);
             }
         }
@@ -135,8 +142,8 @@ namespace ChessGame
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             if (_isBlock) return;
-            int nsy = e.X / 70;
-            int nsx = 7 - (e.Y / 70);
+            var nsy = e.X / 70;
+            var nsx = 7 - (e.Y / 70);
             if (_isSelectFigure)
             {
                 if (nsx == sx && nsy == sy)
@@ -148,9 +155,9 @@ namespace ChessGame
                 {
                     try
                     {
-                        Step s = new Step(sx, sy, nsx, nsy);
+                        var s = new Step(sx, sy, nsx, nsy);
                         _game.doMove(s);
-                        addStepForHistory(s);
+                        AddStepForHistory(s);
                         _curPlayer = _game.Player;
                     }
                     catch (ErrorStepExveption ex)
@@ -175,14 +182,16 @@ namespace ChessGame
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedIndex == 0) tWhite = TypeOfGamer.Human;
-            else tWhite = TypeOfGamer.AI;
+            if (comboBox1.SelectedIndex == 0) _tWhite = TypeOfGamer.Human;
+            else _tWhite = TypeOfGamer.AI;
+            pictureBox1.Invalidate();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox2.SelectedIndex == 0) tBlack = TypeOfGamer.Human;
-            else tBlack = TypeOfGamer.AI;
+            if (comboBox2.SelectedIndex == 0) _tBlack = TypeOfGamer.Human;
+            else _tBlack = TypeOfGamer.AI;
+            pictureBox1.Invalidate();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -190,7 +199,7 @@ namespace ChessGame
 
         }
 
-        private void addStepForHistory(Step s)
+        private void AddStepForHistory(Step s)
         {
             if (listView1.InvokeRequired)
                 listView1.BeginInvoke(new Action<string>(str => listView1.Items.Add(str)), s.ToString());
@@ -199,11 +208,23 @@ namespace ChessGame
 
         private void AIStep(object p)
         {
-            Stopwatch timer = new Stopwatch();
+            var timer = new Stopwatch();
             timer.Start();
-            Step s = _ai.SelectMove((Player)p, 4);
+            _ai.Count = 0;
+            var state = _game.calcState();
+            if (state == State.Draw)
+            {
+                MessageBox.Show("Пат");
+                return;
+            }
+            if (state == State.Checkmate)
+            {
+                MessageBox.Show("Компьютерный игрок проиграл");
+                return;
+            }
+            var s = _ai.SelectMove((Player)p, 4);
             _game.doMove(s);
-             addStepForHistory(s);
+             AddStepForHistory(s);
             _lastStep = s;
             ThreadEnd();
             timer.Stop();
@@ -220,6 +241,10 @@ namespace ChessGame
                 stringState.BeginInvoke(new Action<string> (s => stringState.Text = s), "Ходит игрок");
             else stringState.Text = "Ходит игрок";
             _curPlayer = _game.Player;
+            var state = _game.calcState();
+            if (state == State.Check) MessageBox.Show("Шах!");
+            if (state == State.Checkmate) MessageBox.Show("Мат!");
+            if (state == State.Draw) MessageBox.Show("Пат");
             _isBlock = false;
         }
     }

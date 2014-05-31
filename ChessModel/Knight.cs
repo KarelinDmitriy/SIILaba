@@ -21,15 +21,15 @@ namespace ChessModel
 
         }
 
-        public override IEnumerable<Step> GetRightMove()
+        public override List<Step> GetRightMove()
         {
-            List<Step> ret = new List<Step>();
-            for (int i = 0; i < 8; i++)
+            var ret = new List<Step>();
+            for (var i = 0; i < 8; i++)
             {
                 if ((((X + _dx[i] ) & (int.MaxValue - 7)) == 0) &&
                          ((Y + _dy[i] ) & (int.MaxValue - 7)) == 0)
                 {
-                    int nc = ((X + _dx[i])<<3) + Y + _dy[i];
+                    var nc = ((X + _dx[i])<<3) + Y + _dy[i];
                     if (_board[nc]==null || _board[nc].IsEnemy(this))
                     {
                         ret.Add(new Step(X, Y, nc/8, nc%8));
@@ -58,12 +58,12 @@ namespace ChessModel
 
         public static void preaCalc()
         {
-            for (int j = 0; j < 64; j++)
+            for (var j = 0; j < 64; j++)
             {
                 pSteps[j] = new HashSet<int>();
-                int x = j >> 3;
-                int y = j & 7;
-                for (int i = 0; i < 8; i++)
+                var x = j >> 3;
+                var y = j & 7;
+                for (var i = 0; i < 8; i++)
                 {
                     if (x + _dx[i] >= 0 && x + _dx[i] < 8 && y + _dy[i] >= 0 && y + _dy[i] < 8)
                     {

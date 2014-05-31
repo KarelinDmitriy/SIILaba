@@ -23,7 +23,7 @@ namespace ChessTest
             King.preaCalc();
             Knight.preaCalc();
             //Создаем пешек
-            for (int i=0; i<8; i++)
+            for (var i=0; i<8; i++)
             {
                 new Pawn(Player.White, 1, i);
                 new Pawn(Player.Black, 6, i);
@@ -45,11 +45,11 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            for (int i = 0; i < 100000; i++)
+            for (var i = 0; i < 100000; i++)
             {
                 var g = new Game();
                 var steps = g.getAllLegalMoves(Player.White);
-                int a = steps.Count();
+                var a = steps.Count();
                 a++;
             }
         }
@@ -61,7 +61,7 @@ namespace ChessTest
             Figure._board = new Figure[64];
             Game._board = Figure._board;
             //Создаем пешек
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 new Pawn(Player.White, 1, i);
                 new Pawn(Player.Black, 6, i);
@@ -106,7 +106,7 @@ namespace ChessTest
             King.preaCalc();
             Knight.preaCalc();
             //Создаем пешек
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 new Pawn(Player.White, 1, i);
                 new Pawn(Player.Black, 6, i);
@@ -128,10 +128,10 @@ namespace ChessTest
             new Rook(Player.White, 2, 7);
             new Rook(Player.Black, 5, 7);
 
-            AI ai = new AI();
+            var ai = new AI();
 
-            Game g = new Game();
-            Stopwatch timer = new Stopwatch();
+            var g = new Game();
+            var timer = new Stopwatch();
             timer.Start();
             g.doMove(new Step(1, 3, 2, 3));
 
@@ -156,7 +156,7 @@ namespace ChessTest
             Knight.preaCalc();
             //Создаем пешек
             //Создаем пешек
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 new Pawn(Player.White, 1, i);
                 new Pawn(Player.Black, 6, i);
@@ -178,10 +178,10 @@ namespace ChessTest
             new Rook(Player.White, 0, 7);
             new Rook(Player.Black, 7, 7);
 
-            AI ai = new AI();
+            var ai = new AI();
 
-            Game g = new Game();
-            Stopwatch timer = new Stopwatch();
+            var g = new Game();
+            var timer = new Stopwatch();
             timer.Start();
 
             var x = ai.SelectMove(Player.White, 8);
