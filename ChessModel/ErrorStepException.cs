@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,8 +19,8 @@ namespace ChessModel
         }
         public ErrorStepExveption(string str, Exception inner) { }
         protected ErrorStepExveption(
-            System.Runtime.Serialization.SerializationInfo si,
-            System.Runtime.Serialization.StreamingContext sc) :
+            SerializationInfo si,
+            StreamingContext sc) :
             base(si, sc) { }
 
         public string ErrTok

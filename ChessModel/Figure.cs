@@ -9,10 +9,9 @@ namespace ChessModel
     public abstract class Figure
     {
 #region variable
-        public static Figure[,] _board;
+        public static Figure[] _board;
         protected static Game _game;
-        private int _cost;
-        protected ChessPoint _point;
+        private readonly int _cost;
         protected Player _player;
 #endregion 
 
@@ -21,12 +20,13 @@ namespace ChessModel
         {
             _player = player;
             _cost = cost;
-            _point = new ChessPoint(x, y);
-            _board[x, y] = this;
+            X = x;
+            Y = y;
+            _board[(x<<3) + y] = this;
         }
 
-        public abstract IEnumerable<Step> getRightMove();
-        public abstract bool attackTarget(Figure f);
+        public abstract List<Step> GetRightMove();
+        public abstract bool AttackTarget(Figure f);
 
         public int Cost
         {
@@ -35,17 +35,17 @@ namespace ChessModel
 
         public int X
         {
-            get { return _point.x; }
-            set { _point.x = value; }
+            get;
+            set;
         }
 
         public int Y
         {
-            get { return _point.y;}
-            set { _point.y= value; }
+            get;
+            set;
         }
 
-        public bool isEnemy(Figure f)
+        public bool IsEnemy(Figure f)
         {
             return f._player != _player;
         }
@@ -54,6 +54,8 @@ namespace ChessModel
         {
             get { return _player; }
         }
+
+        public abstract string PictureName();
 #endregion
 
 #region private methods
@@ -61,10 +63,10 @@ namespace ChessModel
 #endregion
 
 #region protected methods
-        protected bool RightMove(ChessPoint to)
+        protected bool RightMove(int x, int y)
         {
-            if (_board[to.x, to.y] == null ||
-                _board[to.x, to.y].isEnemy(this))
+            if (_board[(x<<3)+y] == null ||
+                _board[(x<<3)+y].IsEnemy(this))
             {
                 return true;
             }

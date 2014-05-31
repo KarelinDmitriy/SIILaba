@@ -8,122 +8,105 @@ namespace ChessModel
 {
     public class Pawn : Figure
     {
-#region variable
-        bool _doStep;
-#endregion 
+        #region variable
+        #endregion
 
-#region public methods
+        #region public methods
         public Pawn(Player p, int x, int y)
-            : base(p, 50, x, y)
+            : base(p, 100, x, y)
         {
-            _doStep = false;
+            
         }
 
-        public override IEnumerable<Step> getRightMove()
+        public override List<Step> GetRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((
-            List<Step> ret = new List<Step>();
+            var ret = new List<Step>();
             if (_player == Player.White)
             {
-                if (ChessPoint.PointInBoard(X+1, Y))
+                //считаем, что пешка не можешь быть на позиции х = 7, 
+                //тогда любой ход вперед может допустим, если следующая
+                //клетка не занята
+                if (_board[((X + 1) << 3) + Y] == null)
                 {
-                    if (_board[X+1, Y] == null)
+                    ret.Add(new Step(X, Y, X + 1, Y));
+                    if (X == 1 && _board[((X + 2) << 3) + Y] == null)
                     {
-                         ret.Add(new Step(
-                                new ChessPoint(X, Y),
-                                new ChessPoint(X+1 , Y)
-                                ));
-                        if (!_doStep && _board[X+2, Y] == null)
-                        {
-                                ret.Add(new Step(
-                                    new ChessPoint(X, Y),
-                                    new ChessPoint(X+2 , Y)
-                                    ));
-                        }
-                    }
-                } //if X+1 in board
-                if (ChessPoint.PointInBoard(X+1, Y+1))
-                {
-                    if (_board[X+1, Y+1] != null && _board[X+1, Y+1].isEnemy(this))
-                    {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X + 1, Y + 1)));
+                        ret.Add(new Step(X, Y, X + 2, Y));
                     }
                 }
-                if (ChessPoint.PointInBoard(X+1, Y-1))
+                //Теперь обсчитываем взятия (пока считаем, что взятия не проходе нет)
+                //опять же предполагаем, что мы не можем находиться на х = 7
+                if (((Y - 1) & Int32.MaxValue - 7) == 0
+                    && _board[((X + 1) << 3) + (Y - 1)] != null
+                    && _board[((X + 1) << 3) + (Y - 1)].Player == Player.Black)
                 {
-                    if (_board[X + 1, Y - 1] != null && _board[X + 1, Y - 1].isEnemy(this))
-                    {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X + 1, Y - 1)));
-                    }
+                    ret.Add(new Step(X, Y, X + 1, Y - 1));
+                }
+                if (((Y + 1) & Int32.MaxValue - 7) == 0
+                    && _board[((X + 1) << 3) + (Y + 1)] != null
+                    && _board[((X + 1) << 3) + (Y + 1)].Player == Player.Black)
+                {
+                    ret.Add(new Step(X, Y, X + 1, Y + 1));
                 }
             }
-            else 
+            else
             {
-                if (ChessPoint.PointInBoard(X-1, Y))
+                //считаем, что пешка не можешь быть на позиции х = 0, 
+                //тогда любой ход вперед может допустим, если следующая
+                //клетка не занята
+                if (_board[((X - 1) << 3) + Y] == null)
                 {
-                    if (_board[X-1, Y ] == null)
+                    ret.Add(new Step(X, Y, X - 1, Y));
+                    if (X == 6 && _board[((X - 2) << 3) + Y] == null)
                     {
-                            ret.Add(new Step(
-                                new ChessPoint(X, Y),
-                                new ChessPoint(X-1, Y)
-                                ));
-                        if (!_doStep && _board[X-2, Y] == null)
-                        {
-                                ret.Add(new Step(
-                                    new ChessPoint(X, Y),
-                                    new ChessPoint(X-2, Y)
-                                    ));
-                        }
-                    }
-                } //if X+1 in board
-                if (ChessPoint.PointInBoard(X - 1, Y + 1))
-                {
-                    if (_board[X - 1, Y + 1] != null && _board[X - 1, Y + 1].isEnemy(this))
-                    {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X - 1, Y + 1)));
+                        ret.Add(new Step(X, Y, X - 2, Y));
                     }
                 }
-                if (ChessPoint.PointInBoard(X - 1, Y - 1))
+                //Теперь обсчитываем взятия (пока считаем, что взятия не проходе нет)
+                //опять же предполагаем, что мы не можем находиться на х = 0
+                if (((Y - 1) & Int32.MaxValue - 7) == 0
+                    && _board[((X - 1) << 3) + (Y - 1)] != null
+                    && _board[((X - 1) << 3) + (Y - 1)].Player == Player.White)
                 {
-                    if (_board[X - 1, Y - 1] != null && _board[X - 1, Y - 1].isEnemy(this))
-                    {
-                        ret.Add(new Step(
-                            new ChessPoint(X, Y),
-                            new ChessPoint(X - 1, Y - 1)));
-                    }
+                    ret.Add(new Step(X, Y, X - 1, Y - 1));
+                }
+                if (((Y + 1) & Int32.MaxValue - 7) == 0
+                    && _board[((X - 1) << 3) + (Y + 1)] != null
+                    && _board[((X - 1) << 3) + (Y + 1)].Player == Player.White)
+                {
+                    ret.Add(new Step(X, Y, X - 1, Y + 1));
                 }
             }
             return ret;
         }
 
-        public override bool attackTarget(Figure f)
+        public override bool AttackTarget(Figure f)
         {
-            if (_player == ChessModel.Player.White)
+            if (_player == Player.White)
             {
-                if (ChessPoint.PointInBoard(X + 1, Y + 1))
+                if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + 1, Y + 1] == f) return true;
+                    if (ReferenceEquals(_board[((X + 1) << 3) + Y + 1], f)) return true;
                 }
-                if (ChessPoint.PointInBoard(X + 1, Y - 1))
+                if ((((X + 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y - 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X + 1, Y - 1] == f) return true;
+                    if (ReferenceEquals(_board[((X + 1) << 3) + Y - 1], f)) return true;
                 }
             }
             else
             {
-                if (ChessPoint.PointInBoard(X - 1, Y + 1))
+                if ((((X - 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y + 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y + 1] == f) return true;
+                    if (ReferenceEquals(_board[((X - 1) << 3) + Y + 1], f)) return true;
                 }
-                if (ChessPoint.PointInBoard(X - 1, Y - 1))
+                if ((((X - 1) & (int.MaxValue - 7)) == 0) &&
+                       ((Y - 1) & (int.MaxValue - 7)) == 0)
                 {
-                    if (_board[X - 1, Y - 1] == f) return true;
+                    if (_board[((X - 1) << 3) + Y - 1] == f) return true;
                 }
             }
             return false;
@@ -131,12 +114,18 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return _player==ChessModel.Player.White ? "P" : "p";
+            return _player == Player.White ? "P" : "p";
         }
-#endregion
 
-#region private methods
+        public override string PictureName()
+        {
+            if (_player == Player.White) return "WhitePawn";
+            else return "BlackPawn";
+        }
+        #endregion
 
-#endregion
+        #region private methods
+
+        #endregion
     }
 }
