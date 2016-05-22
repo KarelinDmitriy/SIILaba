@@ -29,10 +29,7 @@ namespace ConsoleTestChess
         static void Main(string[] args)
         {
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-            Figure._board = new Figure[64];
-            Game._board = Figure._board;
-            Move._board = Figure._board;
-            AI._board = Figure._board;
+           var board = new Board();
             //Создаем пешек
             //for (int i = 0; i < 8; i++)
             //{
@@ -56,35 +53,13 @@ namespace ConsoleTestChess
             //new Rook(Player.White, 0, 7);
             //new Rook(Player.Black, 7, 7);
 
-            for (var i = 0; i < 8; i++)
-            {
-                new Pawn(Player.White, 1, i);
-                new Pawn(Player.Black, 6, i);
-            }
-            new Rook(Player.White, 0, 0);
-            new Rook(Player.Black, 7, 0);
-            new Knight(Player.White, 0, 1);
-            new Knight(Player.Black, 7, 1);
-            new Bishop(Player.White, 5, 2);
-            new Bishop(Player.Black, 7, 2);
-            new Queen(Player.White, 3, 3);
-            new Queen(Player.Black, 4, 3);
-            new King(Player.White, 0, 4);
-            new King(Player.Black, 7, 4);
-            new Bishop(Player.White, 0, 5);
-            new Bishop(Player.Black, 7, 5);
-            new Knight(Player.White, 0, 6);
-            new Knight(Player.Black, 7, 6);
-            new Rook(Player.White, 2, 7);
-            new Rook(Player.Black, 5, 7);
-
-            var g = new Game();
-            var ai = new AI();
+            var g = new Game(board);
+            var ai = new AI(board);
             var s = State.Calm;
 
             while (s != State.Checkmate)
             {
-                PrintBoard(Figure._board);
+                PrintBoard(board.Figures);
                 Console.WriteLine();
 
                 Console.Write("Введите ваш ход({0}): ", g.Player);
@@ -92,7 +67,7 @@ namespace ConsoleTestChess
                 if (g.Player == Player.White)
                 {
                     var step = Console.ReadLine();
-                    st = Step.stringToStep(step);
+                    st = Step.StringToStep(step);
                 }
                 else
                 {

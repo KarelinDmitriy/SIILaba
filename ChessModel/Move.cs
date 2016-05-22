@@ -1,31 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChessModel
+﻿namespace ChessModel
 {
-    public class Move
-    {
-#region variable
-        public Step step;
-        public Figure fFrom;
-        public Figure fOut;
-        public static Figure[] _board;
-#endregion 
+	public class Move
+	{
+		private readonly Board _board;
 
-#region public methods
-        public Move(Step step)
-        {
-            this.step = new Step(step);
-            fFrom = _board[(step.fx << 3) + step.fy];
-            fOut = _board[(step.tx << 3) + step.ty];
-        }
-#endregion
+		#region public methods
 
-#region private methods
+		public Move(Step step, Board board)
+		{
+			_board = board;
+			Step = new Step(step);
+			oldFrom = _board[(step.FromX << 3) + step.FromY];
+			oldTo = _board[(step.ToX << 3) + step.ToY];
+		}
 
-#endregion
-    }
+		public void DoMove()
+		{
+			_board[(Step.FromX << 3) + Step.FromY].Move(Step.ToX, Step.ToY);
+			_board[(Step.FromX << 3) + Step.FromY] = null;
+		}
+
+		public void Rollback()
+		{
+			_board[(Step.FromX << 3) + Step.FromY] = oldFrom;
+			_board[(Step.ToX << 3) + Step.ToY] = oldTo;
+		}
+
+		#endregion
+
+		#region variable
+
+		public Step Step;
+		public Figure oldFrom;
+		public Figure oldTo;
+
+		#endregion
+
+		#region private methods
+
+		#endregion
+	}
 }

@@ -15,13 +15,18 @@ namespace ChessModel
 #endregion 
 
 #region public methods
-        public Rook(Player p, int x, int y)
-            :base (p, 500, x, y)
+        public Rook(Player p, Board board, int x, int y)
+            :base (p, board, 500, x, y)
         {
 
         }
 
-        public override List<Step> GetRightMove()
+	    public override Figure Move(int newX, int newY)
+	    {
+		    return new Rook(Player, _board, newX, newY);
+	    }
+
+	    public override List<Step> GetRightMove()
         {
             var ret = new List<Step>();
             var from = pSteps[(X << 3) + Y];
@@ -30,7 +35,7 @@ namespace ChessModel
                 var cur = from.Rays[i];
                 while (cur != null)
                 {
-                    if (_board[(cur.step.tx << 3) + cur.step.ty] == null)
+                    if (_board[(cur.step.ToX << 3) + cur.step.ToY] == null)
                     {
                         ret.Add(cur.step);
                         cur = cur.NextRay;
@@ -38,7 +43,7 @@ namespace ChessModel
                     }
                     else
                     {
-                        if (_board[(cur.step.tx << 3) + cur.step.ty].Player != _player)
+                        if (_board[(cur.step.ToX << 3) + cur.step.ToY].Player != _player)
                             ret.Add(cur.step);
                         break;
                     }
@@ -57,10 +62,10 @@ namespace ChessModel
                 var cur = p.Rays[r];
                 while (cur != null)
                 {
-                    if (cur.step.tx == f.X && cur.step.ty == f.Y) return true;
+                    if (cur.step.ToX == f.X && cur.step.ToY == f.Y) return true;
                     else
                     {
-                        if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
+                        if (_board[(cur.step.ToX << 3) + cur.step.ToY] != null) return false;
                         cur = cur.NextRay;
                     }
                 }

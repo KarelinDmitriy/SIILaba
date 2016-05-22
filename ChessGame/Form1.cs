@@ -23,6 +23,7 @@ namespace ChessGame
         private Player _curPlayer;
         private TypeOfGamer _tWhite, _tBlack; //тип белого/черного игрока
         private Step _lastStep;
+		private Board _mainBoard = new Board();
 
         public Form1()
         {
@@ -32,12 +33,12 @@ namespace ChessGame
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBox1.SelectedIndex = comboBox2.SelectedIndex = 0;
-            Functions.InitDesk();
+            Functions.Precalc();
             _tWhite = TypeOfGamer.Human;
             _tBlack = TypeOfGamer.Human;
             _curPlayer = Player.White;
-            _game = new Game();
-            _ai = new AI();
+            _game = new Game(_mainBoard);
+            _ai = new AI(_mainBoard);
             _lastStep = null;
             pictureBox1.Invalidate();
         }
@@ -74,10 +75,10 @@ namespace ChessGame
             if (_lastStep != null)
             {
                 Brush c = new SolidBrush(Color.Yellow);
-                buffer.Graphics.FillRectangle(c, 70 * _lastStep.fy, 70 * (7 - _lastStep.fx), 70, 70);
-                buffer.Graphics.DrawRectangle(whiteP, 70 * _lastStep.fy, 70 * (7 - _lastStep.fx), 70, 70);
-                buffer.Graphics.FillRectangle(c, 70 * _lastStep.ty, 70 * (7 - _lastStep.tx), 70, 70);
-                buffer.Graphics.DrawRectangle(whiteP, 70 * _lastStep.ty, 70 * (7 - _lastStep.tx), 70, 70);
+                buffer.Graphics.FillRectangle(c, 70 * _lastStep.FromY, 70 * (7 - _lastStep.FromX), 70, 70);
+                buffer.Graphics.DrawRectangle(whiteP, 70 * _lastStep.FromY, 70 * (7 - _lastStep.FromX), 70, 70);
+                buffer.Graphics.FillRectangle(c, 70 * _lastStep.ToY, 70 * (7 - _lastStep.ToX), 70, 70);
+                buffer.Graphics.DrawRectangle(whiteP, 70 * _lastStep.ToY, 70 * (7 - _lastStep.ToX), 70, 70);
                 _lastStep = null;
             }
             if (_isSelectFigure)
@@ -85,14 +86,14 @@ namespace ChessGame
                 Brush green = new SolidBrush(Color.GreenYellow);
                 buffer.Graphics.FillRectangle(green, 70 * sy, 70 * (7 - sx), 70, 70);
                 buffer.Graphics.DrawRectangle(whiteP,70 * sy, 70 * (7 - sx), 70, 70);
-                var steps = Figure._board[(sx << 3) + sy].GetRightMove();
+                var steps = _mainBoard[(sx << 3) + sy].GetRightMove();
                 var allSteps = _game.getAllLegalMoves(_curPlayer);
                 var rSteps = steps.Where(x =>
                 {
-                    var s = allSteps.FirstOrDefault(y => x.fx == y.fx &&
-                                                         x.fy == y.fy &&
-                                                         x.tx == y.tx &&
-                                                         x.ty == y.ty);
+                    var s = allSteps.FirstOrDefault(y => x.FromX == y.FromX &&
+                                                         x.FromY == y.FromY &&
+                                                         x.ToX == y.ToX &&
+                                                         x.ToY == y.ToY);
                     return s != null;
                 }
                     );
@@ -100,20 +101,18 @@ namespace ChessGame
                 Brush red = new SolidBrush(Color.Red);
                 foreach (var x in rSteps)
                 {
-                    if (Figure._board[(x.tx << 3) + x.ty] == null)
-                        buffer.Graphics.FillRectangle(blue, x.ty * 70, (7 - x.tx) * 70, 70, 70);
-                    else
-                        buffer.Graphics.FillRectangle(red, x.ty * 70, (7 - x.tx) * 70, 70, 70);
-                    buffer.Graphics.DrawRectangle(whiteP, x.ty * 70, (7 - x.tx) * 70, 70, 70);
+	                buffer.Graphics.FillRectangle(_mainBoard[(x.ToX << 3) + x.ToY] == null ? blue : red, x.ToY*70,
+		                (7 - x.ToX)*70, 70, 70);
+	                buffer.Graphics.DrawRectangle(whiteP, x.ToY * 70, (7 - x.ToX) * 70, 70, 70);
                 }
             }
             for (var i = 0; i < 8; i++)
             {
                 for (var j = 0; j < 8; j++)
                 {
-                    if (Figure._board[(i << 3) + j] != null)
+                    if (_mainBoard[(i << 3) + j] != null)
                     {
-                        var path = "Picture/" + Figure._board[(i << 3) + j].PictureName() + ".png";
+                        var path = "Picture/" + _mainBoard[(i << 3) + j].PictureName() + ".png";
                         var img = Image.FromFile(path);
                         buffer.Graphics.DrawImage(img, 70 * j, 70 * (7-i));
                     }
@@ -172,11 +171,9 @@ namespace ChessGame
             {
                 sx = nsx;
                 sy = nsy;
-                if (Figure._board[(sx << 3) + sy] != null && Figure._board[(sx<<3)+sy].Player == _curPlayer)
-                {
-                    _isSelectFigure = true;
-                    pictureBox1.Invalidate();
-                }
+	            if (_mainBoard[(sx << 3) + sy] == null || _mainBoard[(sx << 3) + sy].Player != _curPlayer) return;
+	            _isSelectFigure = true;
+	            pictureBox1.Invalidate();
             }
         }
 

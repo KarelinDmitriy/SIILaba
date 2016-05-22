@@ -15,11 +15,16 @@ namespace ChessModel
         #endregion
 
         #region public methods
-        public Queen(Player p, int x, int y)
-            : base(p, 900, x, y)
+        public Queen(Player p, Board board, int x, int y)
+            : base(p, board, 900, x, y)
         { }
 
-        public override List<Step> GetRightMove()
+	    public override Figure Move(int newX, int newY)
+	    {
+		    return new Queen(Player, _board, newX, newY);
+	    }
+
+	    public override List<Step> GetRightMove()
         {
             var ret = new List<Step>();
             var from = pSteps[(X << 3) + Y];
@@ -28,14 +33,14 @@ namespace ChessModel
                 var cur = from.Rays[i];
                 while (cur != null)
                 {
-                    if (_board[(cur.step.tx<<3)+cur.step.ty] == null)
+                    if (_board[(cur.step.ToX<<3)+cur.step.ToY] == null)
                     {
                         ret.Add(cur.step);
                         cur = cur.NextRay;
                     }
                     else
                     {
-                        if (_board[(cur.step.tx << 3) + cur.step.ty].Player != _player)
+                        if (_board[(cur.step.ToX << 3) + cur.step.ToY].Player != _player)
                             ret.Add(cur.step);
                         break;
                     }
@@ -48,18 +53,16 @@ namespace ChessModel
         {
             var t = (f.X << 3) + f.Y;
             var p = pSteps[(X << 3) + Y];
-            if (p.Attack.ContainsKey(t))
-            {
-                var r = p.Attack[t];
-                var cur = p.Rays[r];
-                while (cur != null)
-                {
-                    if (cur.step.tx == f.X && cur.step.ty == f.Y) return true;
-                    if (_board[(cur.step.tx << 3) + cur.step.ty] != null) return false;
-                    cur = cur.NextRay;
-                }
-            }
-            return false;
+	        if (!p.Attack.ContainsKey(t)) return false;
+	        var r = p.Attack[t];
+	        var cur = p.Rays[r];
+	        while (cur != null)
+	        {
+		        if (cur.step.ToX == f.X && cur.step.ToY == f.Y) return true;
+		        if (_board[(cur.step.ToX << 3) + cur.step.ToY] != null) return false;
+		        cur = cur.NextRay;
+	        }
+	        return false;
         }
 
         public override string ToString()
@@ -69,11 +72,10 @@ namespace ChessModel
 
         public override string PictureName()
         {
-            if (_player == Player.White) return "WhiteQueen";
-            return "BlackQueen";
+	        return _player == Player.White ? "WhiteQueen" : "BlackQueen";
         }
 
-        public static void PrecalcStep()
+	    public static void PrecalcStep()
         {
             for (var j=0; j<64; j++)
             {

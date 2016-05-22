@@ -41,7 +41,7 @@
   <ItemGroup>
     <Compile Include="AI.cs" />
     <Compile Include="Bishop.cs" />
-    <Compile Include="Chessboard.cs" />
+    <Compile Include="Board.cs" />
     <Compile Include="ChessPoint.cs" />
     <Compile Include="Figure.cs" />
     <Compile Include="Game.cs" />
@@ -59,7 +59,6 @@
     <Compile Include="Step.cs" />
     <Compile Include="StepFromPosition.cs" />
     <Compile Include="StepsNodes.cs" />
-    <Compile Include="StepStack.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

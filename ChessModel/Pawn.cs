@@ -12,13 +12,22 @@ namespace ChessModel
         #endregion
 
         #region public methods
-        public Pawn(Player p, int x, int y)
-            : base(p, 100, x, y)
+        public Pawn(Player p, Board board, int x, int y)
+            : base(p, board, 100, x, y)
         {
             
         }
 
-        public override List<Step> GetRightMove()
+	    public override Figure Move(int newX, int newY)
+	    {
+		    if (Player == Player.White && newX == 7)
+				return new Queen(Player, _board, newX, newY);
+		    if (Player == Player.Black && newX == 0)
+				return new Queen(Player, _board, newX, newY);
+			return new Pawn(Player, _board, newX, newY);
+	    }
+
+	    public override List<Step> GetRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((
             var ret = new List<Step>();

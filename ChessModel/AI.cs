@@ -11,17 +11,17 @@ namespace ChessModel
     public sealed class AI
     {
         #region variable
-        Stack<Move> _moves;
-        public static Figure[] _board;
+
+        public Board _board;
         Game _g;
         public long Count;
         #endregion
 
         #region public methods
-        public AI()
+        public AI(Board board)
         {
-            _moves = new Stack<Move>();
-            _g = new Game();
+	        _board = board;
+	        _g = new Game(board);
             Count = 0;
         }
 
@@ -29,14 +29,14 @@ namespace ChessModel
         public Step SelectMove(Player p, int maxDeep)
         {
             var moves = _g.getAllLegalMoves(p);
-            var vMoves = new Int32[moves.Count];
+            var vMoves = new int[moves.Count];
             if (p == Player.White)
             {
                 var i = 0;
                 foreach (var x in moves)
                 {
                     DoMove(x);
-                    int res = AlphaBetaBlackWS(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
+                    var res = AlphaBetaBlackWS(int.MinValue, Int32.MaxValue, maxDeep - 1);
                     BackMove();
                     vMoves[i++] = res;
                 }
@@ -98,7 +98,7 @@ namespace ChessModel
         private int AlphaBetaBlackWS(int alpha, int beta, int depth)
         {
             Count++;
-            var min = Int32.MaxValue;
+            var min = int.MaxValue;
             if (depth <= 0) return calculateScoreBlack() - calculateScoreWhite();
             var moves = _g.getAllLegalMoves(Player.Black);
             if (moves.Count() != 0)
@@ -204,61 +204,37 @@ namespace ChessModel
         int calculateScoreWhite()
         {
             var sum = 0;
-            for (var i = 0; i < _board.Length; i++)
+            foreach (var figure in _board.Figures)
             {
-                if (_board[i] != null && _board[i].Player == Player.White)
-                    sum += _board[i].Cost;
+	            if (figure != null && figure.Player == Player.White)
+		            sum += figure.Cost;
             }
-            return sum;
+	        return sum;
         }
 
         //посчитать счет черных (пока не самым оптимальный способ)
         int calculateScoreBlack()
         {
             var sum = 0;
-            for (var i = 0; i < _board.Length; i++)
+            foreach (var figure in _board.Figures)
             {
-                if (_board[i] != null && _board[i].Player == Player.Black)
-                    sum += _board[i].Cost;
+	            if (figure != null && figure.Player == Player.Black)
+		            sum += figure.Cost;
             }
-            return sum;
+	        return sum;
         }
 
         //делает ход и заносит в стек информацию
         //о том, что необходимо для его отмены 
         void DoMove(Step step)
         {
-            var m = new Move(step);
-            _moves.Push(m);
-            _board[(step.tx << 3) + step.ty] = m.fFrom;
-            _board[(step.fx << 3) + step.fy] = null;
-            if (m.fFrom is Pawn)
-            {
-                if (m.fFrom.Player == Player.White && step.tx == 7)
-                    new Queen(Player.White, step.tx, step.ty);
-                else if (m.fFrom.Player == Player.Black && step.tx == 0)
-                    new Queen(Player.Black, step.tx, step.ty);
-                else
-                {
-                    m.fFrom.X = step.tx;
-                    m.fFrom.Y = step.ty;
-                }
-            }
-            else
-            {
-                m.fFrom.X = step.tx;
-                m.fFrom.Y = step.ty;
-            }
+           _board.Move(step);
         }
 
         //отменяет последний ход в стеке
         void BackMove()
         {
-            var m = _moves.Pop();
-            _board[(m.step.fx << 3) + m.step.fy] = m.fFrom;
-            _board[(m.step.tx << 3) + m.step.ty] = m.fOut;
-            m.fFrom.X = m.step.fx;
-            m.fFrom.Y = m.step.fy;
+            _board.CanselMove();
         }
 
         #endregion

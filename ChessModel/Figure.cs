@@ -1,79 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ChessModel
 {
-    public abstract class Figure
-    {
-#region variable
-        public static Figure[] _board;
-        protected static Game _game;
-        private readonly int _cost;
-        protected Player _player;
-#endregion 
+	public abstract class Figure
+	{
+		#region protected methods
 
-#region public methods
-        public Figure(Player player, int cost, int x, int y)
-        {
-            _player = player;
-            _cost = cost;
-            X = x;
-            Y = y;
-            _board[(x<<3) + y] = this;
-        }
+		protected bool RightMove(int x, int y)
+		{
+			return _board[(x << 3) + y] == null ||
+			       _board[(x << 3) + y].IsEnemy(this);
+		}
 
-        public abstract List<Step> GetRightMove();
-        public abstract bool AttackTarget(Figure f);
+		#endregion
 
-        public int Cost
-        {
-            get { return _cost; }
-        }
+		#region variable
 
-        public int X
-        {
-            get;
-            set;
-        }
+		public Board _board;
+		protected static Game _game;
+		protected Player _player;
 
-        public int Y
-        {
-            get;
-            set;
-        }
+		#endregion
 
-        public bool IsEnemy(Figure f)
-        {
-            return f._player != _player;
-        }
+		#region public methods
 
-        public Player Player
-        {
-            get { return _player; }
-        }
+		protected Figure(Player player, Board board, int cost, int x, int y)
+		{
+			_player = player;
+			_board = board;
+			Cost = cost;
+			X = x;
+			Y = y;
+			_board[(x << 3) + y] = this;
+		}
 
-        public abstract string PictureName();
-#endregion
+		public abstract Figure Move(int newX, int newY);
 
-#region private methods
+		public abstract List<Step> GetRightMove();
+		public abstract bool AttackTarget(Figure f);
 
-#endregion
+		public int Cost { get; }
 
-#region protected methods
-        protected bool RightMove(int x, int y)
-        {
-            if (_board[(x<<3)+y] == null ||
-                _board[(x<<3)+y].IsEnemy(this))
-            {
-                return true;
-            }
-            return false;
-        }
-#endregion 
-    
-        
-    }
+		public int X { get; private set; }
+		public int Y { get; private set; }
+
+		public bool IsEnemy(Figure f)
+		{
+			return f._player != _player;
+		}
+
+		public Player Player => _player;
+
+		public abstract string PictureName();
+
+		#endregion
+
+		#region private methods
+
+		#endregion
+	}
 }

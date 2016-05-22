@@ -15,13 +15,18 @@ namespace ChessModel
         #endregion
 
         #region public methods
-        public King(Player p, int x, int y)
-            : base(p, 10000, x, y)
+        public King(Player p, Board board, int x, int y)
+            : base(p, board, 10000, x, y)
         {
 
         }
 
-        public override List<Step> GetRightMove()
+	    public override Figure Move(int newX, int newY)
+	    {
+			return new King(Player, _board, newX, newY);
+	    }
+
+	    public override List<Step> GetRightMove()
         {
             var ret = new List<Step>();
             for (var i = 0; i < 8; i++)
