@@ -4,7 +4,9 @@ using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using MoreLinq;
 
 namespace ChessModel
 {
@@ -12,82 +14,116 @@ namespace ChessModel
     {
         #region variable
 
-        public Board _board;
-        Game _g;
-        public long Count;
+	    const int ThreadCount = 4;
+	    private int maxDeep;
+
+		private readonly List<StepWithScore> _threadsResults = new List<StepWithScore>();
+
+	    public long Count;
         #endregion
 
         #region public methods
-        public AI(Board board)
+        public AI()
         {
-	        _board = board;
-	        _g = new Game(board);
-            Count = 0;
         }
 
         //выбирает ход для выбранного игрока с глубиной не более maxDeep
-        public Step SelectMove(Player p, int maxDeep)
+        public Step SelectMove(Player p, int maxDeep, Board board)
         {
-            var moves = _g.getAllLegalMoves(p);
-            var vMoves = new int[moves.Count];
-            if (p == Player.White)
-            {
-                var i = 0;
-                foreach (var x in moves)
-                {
-                    DoMove(x);
-                    var res = AlphaBetaBlackWS(int.MinValue, Int32.MaxValue, maxDeep - 1);
-                    BackMove();
-                    vMoves[i++] = res;
-                }
-            }
-            else
-            {
-                var i = 0;
-                foreach (var x in moves)
-                {
-                    DoMove(x);
-                    int res = AlphaBetaWhiteBS(Int32.MinValue, Int32.MaxValue, maxDeep - 1);
-                    BackMove();
-                    vMoves[i++] = res;
-                }
-            }
-            var max = vMoves.Max();
-            var arrMoves = moves.ToArray();
-            var bestSteps = new List<Step>();
-            for (var i = 0; i < vMoves.Length; i++)
-            {
-                if (vMoves[i] == max)
-                    bestSteps.Add(arrMoves[i]);
-            }
-            var rand = new Random();
-            return bestSteps[rand.Next() % bestSteps.Count];
+			Count = 0;
+	        this.maxDeep = maxDeep;
+	        var game = new Game(board);
+            var moves = game.getAllLegalMoves(p);
+	        var b = moves.Batch(moves.Count/ThreadCount).ToList();
+	        var thraads = new Thread[b.Count];
+	        var n = 0;
+	        foreach (var curMoves in b)
+	        {
+		        var args = new TheadArg
+		        {
+					board = new Board(board),
+					startPlayer = p,
+					steps = curMoves.ToList()
+				};
+		        var thread = new Thread(Process) {IsBackground = true};
+				thread.Start(args);
+		        thraads[n++] = thread;
+	        }
+	        while (thraads.Any(x => x.IsAlive))
+	        {
+		        Thread.Sleep(100);
+	        }
+	        var res = _threadsResults.MaxBy(x => x.Score);
+	        return res.Step;
         }
         #endregion
 
         #region private methods
 
+	    private void Process(object obj)
+	    {
+		    var args = obj as TheadArg;
+			var game = new Game(args.board);
+		    var bMoves = new int[args.steps.Count];
+			if (args.startPlayer == Player.White)
+			{
+				var i = 0;
+				foreach (var x in args.steps)
+				{
+					DoMove(x, args.board);
+					var res = AlphaBetaBlackWS(int.MinValue, Int32.MaxValue, maxDeep - 1, game);
+					BackMove(args.board);
+					bMoves[i++] = res;
+				}
+			}
+			else
+			{
+				var i = 0;
+				foreach (var x in args.steps)
+				{
+					DoMove(x, args.board);
+					int res = AlphaBetaWhiteBS(int.MinValue, Int32.MaxValue, maxDeep - 1, game);
+					BackMove(args.board);
+					bMoves[i++] = res;
+				}
+			}
+			var max = bMoves.Max();
+		    var arrMoves = args.steps;
+			var bestSteps = new List<Step>();
+			for (var i = 0; i < bMoves.Length; i++)
+			{
+				if (bMoves[i] == max)
+					bestSteps.Add(arrMoves[i]);
+			}
+			var rand = new Random();
+			this._threadsResults.Add(new StepWithScore
+			{
+				Score = max,
+				Step = bestSteps[rand.Next() % bestSteps.Count]
+			});
+		}
+
         #region White Step First
 
-        private int AlphaBetaWhiteWS(int alpha, int beta, int depth)
+        private int AlphaBetaWhiteWS(int alpha, int beta, int depth, Game game)
         {
             Count++;
             var max = Int32.MinValue;
-            if (depth <= 0) return calculateScoreWhite() - calculateScoreBlack();
-            var moves = _g.getAllLegalMoves(Player.White);
+            if (depth <= 0) return calculateScoreWhite(game._board) - calculateScoreBlack(game._board);
+            var moves = game.getAllLegalMoves(Player.White);
             if (moves.Count() != 0)
                 foreach (var x in moves)
                 {
-                    DoMove(x);
-                    var tmp = AlphaBetaBlackWS(alpha, beta, depth - 1);
-                    BackMove();
+                    DoMove(x, game._board);
+                    var tmp = AlphaBetaBlackWS(alpha, beta, depth - 1, game);
+                    BackMove(game._board);
                     if (tmp > max) max = tmp;
                     if (tmp > alpha) alpha = tmp;
                     if (max >= beta) return max;
                 }
             else
             {
-                var state = _g.calcState();
+                var state = game.calcState();
                 if (state == State.Checkmate)
                     return 0;
                 else return -10000;
@@ -95,28 +131,26 @@ namespace ChessModel
             return max;
         }
 
-        private int AlphaBetaBlackWS(int alpha, int beta, int depth)
+        private int AlphaBetaBlackWS(int alpha, int beta, int depth, Game game)
         {
             Count++;
             var min = int.MaxValue;
-            if (depth <= 0) return calculateScoreBlack() - calculateScoreWhite();
-            var moves = _g.getAllLegalMoves(Player.Black);
+            if (depth <= 0) return calculateScoreBlack(game._board) - calculateScoreWhite(game._board);
+            var moves = game.getAllLegalMoves(Player.Black);
             if (moves.Count() != 0)
                 foreach (var x in moves)
                 {
-                    DoMove(x);
-                    var tmp = AlphaBetaWhiteWS(alpha, beta, depth - 1);
-                    BackMove();
+                    DoMove(x, game._board);
+                    var tmp = AlphaBetaWhiteWS(alpha, beta, depth - 1, game);
+                    BackMove(game._board);
                     if (tmp < min) min = tmp;
                     if (tmp < beta) beta = tmp;
                     if (min <= alpha) return min;
                 }
             else
             {
-                var state = _g.calcState();
-                if (state == State.Checkmate)
-                    return 0;
-                else return 10000;
+                var state = game.calcState();
+                return state == State.Checkmate ? 0 : 10000;
             }
             return min;
         }
@@ -125,20 +159,20 @@ namespace ChessModel
 
         #region Black Step First
 
-        private int AlphaBetaWhiteBS(int alpha, int beta, int depth)
+        private int AlphaBetaWhiteBS(int alpha, int beta, int depth, Game game)
         {
             Count++;
             var min = Int32.MaxValue;
             if (depth <= 0)
             {
-                var state = _g.calcState(Player.White);
+                var state = game.calcState(Player.White);
                 switch (state)
                 {
                     case State.Calm:
-                        return calculateScoreWhite() - calculateScoreBlack();
+                        return calculateScoreWhite(game._board) - calculateScoreBlack(game._board);
                         break;
                     case State.Check:
-                        return calculateScoreWhite() - calculateScoreBlack() - 300 ;
+                        return calculateScoreWhite(game._board) - calculateScoreBlack(game._board) - 300 ;
                         break;
                     case State.Checkmate:
                         return Int32.MinValue;
@@ -148,12 +182,12 @@ namespace ChessModel
                         break;
                 }
             }
-            var moves = _g.getAllLegalMoves(Player.White);
+            var moves = game.getAllLegalMoves(Player.White);
             foreach (var x in moves)
             {
-                DoMove(x);
-                var tmp = AlphaBetaBlackBS(alpha, beta, depth - 1);
-                BackMove();
+                DoMove(x, game._board);
+                var tmp = AlphaBetaBlackBS(alpha, beta, depth - 1, game);
+                BackMove(game._board);
                 if (tmp < min) min = tmp;
                 if (tmp < beta) beta = tmp;
                 if (min <= alpha) return min;
@@ -161,35 +195,31 @@ namespace ChessModel
             return min;
         }
 
-        private int AlphaBetaBlackBS(int alpha, int beta, int depth)
+        private int AlphaBetaBlackBS(int alpha, int beta, int depth, Game game)
         {
-            Count++;
+            Interlocked.Increment(ref Count);
             var max = Int32.MinValue;
             if (depth <= 0)
             {
-                var state = _g.calcState(Player.White);
+                var state = game.calcState(Player.White);
                 switch (state)
                 {
                     case State.Calm:
-                        return calculateScoreBlack() - calculateScoreWhite();
-                        break;
+                        return calculateScoreBlack(game._board) - calculateScoreWhite(game._board);
                     case State.Check:
-                        return calculateScoreBlack()- 300-calculateScoreWhite()   ;
-                        break;
+                        return calculateScoreBlack(game._board)- 300-calculateScoreWhite(game._board);
                     case State.Checkmate:
                         return Int32.MaxValue;
-                        break;
                     case State.Draw:
                         return 0;
-                        break;
                 }
             }
-            var moves = _g.getAllLegalMoves(Player.Black);
+            var moves = game.getAllLegalMoves(Player.Black);
             foreach (var x in moves)
             {
-                DoMove(x);
-                var tmp = AlphaBetaWhiteBS(alpha, beta, depth - 1);
-                BackMove();
+                DoMove(x, game._board);
+                var tmp = AlphaBetaWhiteBS(alpha, beta, depth - 1, game);
+                BackMove(game._board);
                 if (tmp > max) max = tmp;
                 if (tmp > alpha) alpha = tmp;
                 if (max >= beta) return max;
@@ -201,10 +231,10 @@ namespace ChessModel
 
 
         //посчитать счет белых (пока не самым оптимальный способ)
-        int calculateScoreWhite()
+        static int calculateScoreWhite(Board board)
         {
             var sum = 0;
-            foreach (var figure in _board.Figures)
+            foreach (var figure in board.Figures)
             {
 	            if (figure != null && figure.Player == Player.White)
 		            sum += figure.Cost;
@@ -213,10 +243,10 @@ namespace ChessModel
         }
 
         //посчитать счет черных (пока не самым оптимальный способ)
-        int calculateScoreBlack()
+        static int calculateScoreBlack(Board board)
         {
             var sum = 0;
-            foreach (var figure in _board.Figures)
+            foreach (var figure in board.Figures)
             {
 	            if (figure != null && figure.Player == Player.Black)
 		            sum += figure.Cost;
@@ -226,17 +256,30 @@ namespace ChessModel
 
         //делает ход и заносит в стек информацию
         //о том, что необходимо для его отмены 
-        void DoMove(Step step)
+        static void DoMove(Step step, Board board)
         {
-           _board.Move(step);
+           board.Move(step);
         }
 
         //отменяет последний ход в стеке
-        void BackMove()
+        void BackMove(Board board)
         {
-            _board.CanselMove();
+            board.CanselMove();
         }
 
         #endregion
     }
+
+	public class TheadArg
+	{
+		public Board board;
+		public List<Step> steps;
+		public Player startPlayer;
+	}
+
+	public class StepWithScore
+	{
+		public Step Step;
+		public long Score;
+	}
 }

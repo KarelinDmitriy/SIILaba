@@ -27,6 +27,11 @@ namespace ChessModel
 			return new Knight(Player, _board, newX, newY);
 	    }
 
+	    public override void CopyOnOtherBoard(Board newBoard)
+	    {
+		    new Knight(Player, newBoard, X, Y);
+	    }
+
 	    public override List<Step> GetRightMove()
         {
             var ret = new List<Step>();

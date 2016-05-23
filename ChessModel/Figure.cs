@@ -35,6 +35,7 @@ namespace ChessModel
 		}
 
 		public abstract Figure Move(int newX, int newY);
+		public abstract void CopyOnOtherBoard(Board newBoard);
 
 		public abstract List<Step> GetRightMove();
 		public abstract bool AttackTarget(Figure f);

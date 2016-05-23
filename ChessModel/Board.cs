@@ -36,6 +36,17 @@ namespace ChessModel
 			
 		}
 
+		public Board(Board board)
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				if (board.Figures[i] != null)
+				{
+					board.Figures[i].CopyOnOtherBoard(this);
+				}
+			}
+		}
+
 		public Figure[] Figures { get; set; } = new Figure[64];
 
 		public Figure this[int index]

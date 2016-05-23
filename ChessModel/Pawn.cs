@@ -27,6 +27,11 @@ namespace ChessModel
 			return new Pawn(Player, _board, newX, newY);
 	    }
 
+	    public override void CopyOnOtherBoard(Board newBoard)
+	    {
+		    new Pawn(Player, newBoard, X, Y);
+	    }
+
 	    public override List<Step> GetRightMove()
         {
             //Пешки отстой, в общую концепию не вписываются(((

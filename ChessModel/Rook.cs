@@ -26,6 +26,11 @@ namespace ChessModel
 		    return new Rook(Player, _board, newX, newY);
 	    }
 
+	    public override void CopyOnOtherBoard(Board newBoard)
+	    {
+		    new Rook(Player, newBoard, X, Y);
+	    }
+
 	    public override List<Step> GetRightMove()
         {
             var ret = new List<Step>();

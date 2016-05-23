@@ -54,7 +54,7 @@ namespace ConsoleTestChess
             //new Rook(Player.Black, 7, 7);
 
             var g = new Game(board);
-            var ai = new AI(board);
+            var ai = new AI();
             var s = State.Calm;
 
             while (s != State.Checkmate)
@@ -73,7 +73,7 @@ namespace ConsoleTestChess
                 {
                     var tim = new Stopwatch();
                     tim.Start();
-                    st = ai.SelectMove(g.Player, 6);
+                    st = ai.SelectMove(g.Player, 6, board);
                     tim.Stop();
                     Console.WriteLine(tim.ElapsedMilliseconds);
                     Console.WriteLine();

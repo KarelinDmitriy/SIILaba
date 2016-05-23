@@ -38,7 +38,7 @@ namespace ChessGame
             _tBlack = TypeOfGamer.Human;
             _curPlayer = Player.White;
             _game = new Game(_mainBoard);
-            _ai = new AI(_mainBoard);
+            _ai = new AI();
             _lastStep = null;
             pictureBox1.Invalidate();
         }
@@ -219,7 +219,7 @@ namespace ChessGame
                 MessageBox.Show("Компьютерный игрок проиграл");
                 return;
             }
-            var s = _ai.SelectMove((Player)p, 4);
+            var s = _ai.SelectMove((Player)p, 6, _mainBoard);
             _game.doMove(s);
              AddStepForHistory(s);
             _lastStep = s;
