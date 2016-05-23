@@ -23,7 +23,6 @@ namespace ChessModel
 
 	    public override Figure Move(int newX, int newY)
 	    {
-			_board[(newX << 3) + newY] = null;
 			return new Knight(Player, _board, newX, newY);
 	    }
 

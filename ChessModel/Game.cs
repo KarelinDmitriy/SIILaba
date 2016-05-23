@@ -47,6 +47,11 @@ namespace ChessModel
 			return count > 0 ? State.Check : State.Checkmate;
 		}
 
+		public int KingAlert(Player p)
+		{
+			return countAtacksToFigure(p == Player.White ? _whiteKing : _blackKing);
+		}
+
 		public State calcState(Player p)
 		{
 			var ownKing = p == Player.White ? _whiteKing : _blackKing;
@@ -62,16 +67,16 @@ namespace ChessModel
 		public List<Step> getAllLegalMoves(Player p)
 		{
 			var ret = new List<Step>();
-			var moves = getAllRightMoves(p);
+			var steps = getAllRightMoves(p);
 			//запоминаем, какого короля мы должны атаковать
 			var ownKing = p == Player.White ? _whiteKing : _blackKing;
-			foreach (var move in moves)
+			foreach (var step in steps)
 			{
 				//пытаемся делать ход+
-				_board.Move(move);
+				_board.Move(step);
 				//ход сделали, теперь пытаемя проведить, а не шах ли нам после этого
 				var kingAlert = countAtacksToFigure(ownKing);
-				if (kingAlert == 0) ret.Add(move);
+				if (kingAlert == 0) ret.Add(step);
 				_board.CanselMove();
 			}
 			return ret;
@@ -97,12 +102,13 @@ namespace ChessModel
 
 		private int countAtacksToFigure(Figure f)
 		{
+			var res = 0;
 			foreach (var x in _board.Figures)
 			{
 				if (x == null || x.Player == f.Player) continue;
-				if (x.AttackTarget(f)) return 1;
+				if (x.AttackTarget(f)) res++;
 			}
-			return 0;
+			return res;
 		}
 
 		private Player getEnemy(Player p)

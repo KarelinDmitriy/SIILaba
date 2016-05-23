@@ -127,14 +127,14 @@ namespace ChessTest
             new Rook(Player.White, board, 2, 7);
             new Rook(Player.Black, board, 5, 7);
 
-            var ai = new AI(board);
+            var ai = new AI();
 
             var g = new Game(board);
             var timer = new Stopwatch();
             timer.Start();
             g.doMove(new Step(1, 3, 2, 3));
 
-            var x = ai.SelectMove(Player.Black, 6);
+            var x = ai.SelectMove(Player.Black, 6, board);
             timer.Stop();
             Assert.AreEqual(1000, timer.ElapsedMilliseconds);
             Assert.AreEqual(10000, ai.Count);
@@ -174,13 +174,13 @@ namespace ChessTest
             new Rook(Player.White, board, 0, 7);
             new Rook(Player.Black, board, 7, 7);
 
-            var ai = new AI(board);
+            var ai = new AI();
 
             var g = new Game(board);
             var timer = new Stopwatch();
             timer.Start();
 
-            var x = ai.SelectMove(Player.White, 8);
+            var x = ai.SelectMove(Player.White, 8, board);
             timer.Stop();
          //   Assert.AreEqual(1000, timer.ElapsedMilliseconds);
             Assert.AreEqual(10000, ai.Count);

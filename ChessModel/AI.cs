@@ -14,8 +14,8 @@ namespace ChessModel
     {
         #region variable
 
-	    const int ThreadCount = 4;
-	    private int maxDeep;
+	    const int ThreadCount = 8;
+	    private int _maxDeep;
 
 		private readonly List<StepWithScore> _threadsResults = new List<StepWithScore>();
 
@@ -31,9 +31,11 @@ namespace ChessModel
         public Step SelectMove(Player p, int maxDeep, Board board)
         {
 			Count = 0;
-	        this.maxDeep = maxDeep;
-	        var game = new Game(board);
-            var moves = game.getAllLegalMoves(p);
+	        _maxDeep = maxDeep;
+			_threadsResults.Clear();
+	        var nBoard = new Board(board);
+	        var game = new Game(nBoard);
+	        var moves = game.getAllLegalMoves(p);
 	        var b = moves.Batch(moves.Count/ThreadCount).ToList();
 	        var thraads = new Thread[b.Count];
 	        var n = 0;
@@ -71,7 +73,7 @@ namespace ChessModel
 				foreach (var x in args.steps)
 				{
 					DoMove(x, args.board);
-					var res = AlphaBetaBlackWS(int.MinValue, Int32.MaxValue, maxDeep - 1, game);
+					var res = AlphaBetaBlackWS(int.MinValue, Int32.MaxValue, _maxDeep - 1, game);
 					BackMove(args.board);
 					bMoves[i++] = res;
 				}
@@ -82,7 +84,7 @@ namespace ChessModel
 				foreach (var x in args.steps)
 				{
 					DoMove(x, args.board);
-					int res = AlphaBetaWhiteBS(int.MinValue, Int32.MaxValue, maxDeep - 1, game);
+					int res = AlphaBetaWhiteBS(int.MinValue, Int32.MaxValue, _maxDeep - 1, game);
 					BackMove(args.board);
 					bMoves[i++] = res;
 				}
@@ -109,7 +111,7 @@ namespace ChessModel
         {
             Count++;
             var max = Int32.MinValue;
-            if (depth <= 0) return calculateScoreWhite(game._board) - calculateScoreBlack(game._board);
+            if (depth <= 0) return calculateScoreWhite(game._board, game) - calculateScoreBlack(game._board, game);
             var moves = game.getAllLegalMoves(Player.White);
             if (moves.Count() != 0)
                 foreach (var x in moves)
@@ -135,7 +137,7 @@ namespace ChessModel
         {
             Count++;
             var min = int.MaxValue;
-            if (depth <= 0) return calculateScoreBlack(game._board) - calculateScoreWhite(game._board);
+            if (depth <= 0) return calculateScoreBlack(game._board, game) - calculateScoreWhite(game._board, game);
             var moves = game.getAllLegalMoves(Player.Black);
             if (moves.Count() != 0)
                 foreach (var x in moves)
@@ -169,17 +171,13 @@ namespace ChessModel
                 switch (state)
                 {
                     case State.Calm:
-                        return calculateScoreWhite(game._board) - calculateScoreBlack(game._board);
-                        break;
+                        return calculateScoreWhite(game._board, game) - calculateScoreBlack(game._board, game);
                     case State.Check:
-                        return calculateScoreWhite(game._board) - calculateScoreBlack(game._board) - 300 ;
-                        break;
+                        return calculateScoreWhite(game._board, game) - calculateScoreBlack(game._board, game) - 300 ;
                     case State.Checkmate:
                         return Int32.MinValue;
-                        break;
                     case State.Draw:
                         return 0;
-                        break;
                 }
             }
             var moves = game.getAllLegalMoves(Player.White);
@@ -205,9 +203,9 @@ namespace ChessModel
                 switch (state)
                 {
                     case State.Calm:
-                        return calculateScoreBlack(game._board) - calculateScoreWhite(game._board);
+                        return calculateScoreBlack(game._board, game) - calculateScoreWhite(game._board, game);
                     case State.Check:
-                        return calculateScoreBlack(game._board)- 300-calculateScoreWhite(game._board);
+                        return calculateScoreBlack(game._board, game)- 300-calculateScoreWhite(game._board, game);
                     case State.Checkmate:
                         return Int32.MaxValue;
                     case State.Draw:
@@ -231,27 +229,85 @@ namespace ChessModel
 
 
         //посчитать счет белых (пока не самым оптимальный способ)
-        static int calculateScoreWhite(Board board)
+        static int calculateScoreWhite(Board board, Game game)
         {
             var sum = 0;
+	        var enemys = new List<Figure>();
+	        foreach (var figure in board.Figures)
+	        {
+		        if (figure != null && figure.Player == Player.Black)
+					enemys.Add(figure);
+	        }
             foreach (var figure in board.Figures)
             {
 	            if (figure != null && figure.Player == Player.White)
+	            {
 		            sum += figure.Cost;
+		            var attCount = 0;
+		            for (int i = 0; i < enemys.Count; i++)
+		            {
+			            if (figure.AttackTarget(enemys[i]))
+				            attCount++;
+		            }
+		            sum += (attCount - 1)*((int)(figure.Cost*0.3));
+		            if (figure is Queen || figure is Bishop || figure is Knight)
+		            {
+			            if ((figure.X == 4 || figure.X == 5) && (figure.Y == 5 || figure.Y == 4))
+				            sum += (int) (figure.X*1.2);
+		            }
+		            if (figure is Pawn)
+		            {
+			            
+		            }
+	            }
             }
+	        var kingAtt = game.KingAlert(Player.White);
+	        if (kingAtt == 1)
+		        sum -= 400;
+			else if (kingAtt > 1)
+				sum -= 800;
 	        return sum;
         }
 
         //посчитать счет черных (пока не самым оптимальный способ)
-        static int calculateScoreBlack(Board board)
+        static int calculateScoreBlack(Board board, Game game)
         {
             var sum = 0;
-            foreach (var figure in board.Figures)
-            {
-	            if (figure != null && figure.Player == Player.Black)
-		            sum += figure.Cost;
-            }
-	        return sum;
+			var enemys = new List<Figure>();
+			foreach (var figure in board.Figures)
+			{
+				if (figure != null && figure.Player == Player.White)
+					enemys.Add(figure);
+			}
+			foreach (var figure in board.Figures)
+			{
+				if (figure != null && figure.Player == Player.Black)
+				{
+					sum += figure.Cost;
+					var attCount = 0;
+					for (int i = 0; i < enemys.Count; i++)
+					{
+						if (figure.AttackTarget(enemys[i]))
+							attCount++;
+					}
+					sum += (attCount - 1) * ((int)(figure.Cost * 0.3));
+					if (figure is Queen || figure is Bishop || figure is Knight)
+					{
+						if ((figure.X == 4 || figure.X == 5) && (figure.Y == 5 || figure.Y == 4))
+							sum += (int)(figure.X * 1.2);
+					}
+					if (figure is Pawn)
+					{
+
+					}
+				}
+			}
+			var kingAtt = game.KingAlert(Player.Black);
+			if (kingAtt == 1)
+				sum -= 400;
+			else if (kingAtt > 1)
+				sum -= 800;
+			return sum;
         }
 
         //делает ход и заносит в стек информацию

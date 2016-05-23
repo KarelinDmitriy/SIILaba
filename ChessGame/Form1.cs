@@ -219,7 +219,7 @@ namespace ChessGame
                 MessageBox.Show("Компьютерный игрок проиграл");
                 return;
             }
-            var s = _ai.SelectMove((Player)p, 6, _mainBoard);
+            var s = _ai.SelectMove((Player)p, 4, _mainBoard);
             _game.doMove(s);
              AddStepForHistory(s);
             _lastStep = s;

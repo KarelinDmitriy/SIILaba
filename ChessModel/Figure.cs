@@ -17,7 +17,6 @@ namespace ChessModel
 		#region variable
 
 		public Board _board;
-		protected static Game _game;
 		protected Player _player;
 
 		#endregion
